@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第5关 - 找相同小动物</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="game-page">
+    <div class="container">
+        <div class="game-header">
+            <div class="back-btn" onclick="goHome()">⬅️</div>
+            <div class="game-info">
+                <div class="level-title">第 5 关 👑</div>
+                <div class="timer" id="timer">⏱️ 0秒</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="game-instruction">
+                🏆 <strong>挑战关卡！</strong><br>
+                找出<strong>5只</strong>和目标相同的小动物！<br>
+                <small style="color: #ff6b6b;">⚠️ 错3次项目失败！动物会变小哦！</small>
+            </div>
+            
+            <div class="target-animal" id="targetAnimal">
+                🐼
+            </div>
+            
+            <div class="animals-grid" id="animalsGrid" style="grid-template-columns: repeat(5, 1fr);">
+                <!-- 动物卡片将由JavaScript生成 -->
+            </div>
+            
+            <div style="margin-top: 15px; display: flex; justify-content: space-around; font-size: 18px; color: #666;">
+                <div>
+                    找到: <span id="foundCount" style="color: #00b894; font-weight: bold; font-size: 24px;">0</span> / 5
+                </div>
+                <div>
+                    错误: <span id="errorCount" style="color: #d63031; font-weight: bold; font-size: 24px;">0</span> / 3
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <h2 id="resultTitle">🎉 恭喜通关!</h2>
+            <div class="star-rating" id="starRating">⭐⭐⭐</div>
+            <p id="resultMessage">你完成了第一组挑战！<br>你是专注力小达人！🏆</p>
+            <p id="timeUsed">用时: 0秒</p>
+            <p id="resultTips" style="margin-top:15px;padding:10px;background:#fff3cd;border-radius:8px;font-size:14px;line-height:1.6;color:#856404;"></p>
+            <div>
+                <button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button>
+                <button class="btn btn-primary" onclick="goHome()">🏠 返回主页</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="failModal">
+        <div class="modal-content">
+            <h2>😢 再试一次!</h2>
+            <p>挑战关卡很难，但你可以做到的！</p>
+            <div>
+                <button class="btn btn-secondary" onclick="goHome()">🏠 返回主页</button>
+                <button class="btn btn-primary" onclick="retryLevel()">🔄 重新开始</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        const GAME_CONFIG = {
+            level: 5,
+            game: 'game1',
+            gridSize: 20,
+            targetAnimal: '🐼',
+            animals: [
+                '🐼', '🐼', '🐼', '🐼', '🐼', 
+                '🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐨', '🐯', '🦁', 
+                '🐷', '🐮', '🐸', '🐵', '🐔'
+            ],
+            targetCount: 5,
+            maxErrors: 3,
+        };
+
+        let startTime;
+        let timerInterval;
+        let foundCount = 0;
+        let errorCount = 0;
+        let gameCompleted = false;
+
+        function initGame() {
+            startTime = Date.now();
+            gameCompleted = false;
+            foundCount = 0;
+            errorCount = 0;
+            
+            document.getElementById('targetAnimal').textContent = GAME_CONFIG.targetAnimal;
+            document.getElementById('targetAnimal').style.fontSize = '80px';
+            document.getElementById('targetAnimal').style.marginBottom = '30px';
+            
+            generateAnimals();
+            startTimer();
+            updateCounts();
+        }
+
+        function generateAnimals() {
+            const grid = document.getElementById('animalsGrid');
+            grid.innerHTML = '';
+            
+            const shuffled = [...GAME_CONFIG.animals].sort(() => Math.random() - 0.5);
+            
+            shuffled.forEach((animal, index) => {
+                const card = document.createElement('div');
+                card.className = 'animal-card';
+                card.textContent = animal;
+                card.style.fontSize = '36px'; // 最小的图标
+                card.style.borderRadius = '15px';
+                card.onclick = () => selectAnimal(animal, card);
+                grid.appendChild(card);
+            });
+        }
+
+        function selectAnimal(animal, cardElement) {
+            if (gameCompleted || cardElement.classList.contains('correct')) return;
+            
+            cardElement.classList.add('selected');
+            
+            if (animal === GAME_CONFIG.targetAnimal) {
+                playSound('correct');
+                cardElement.classList.add('correct');
+                cardElement.onclick = null;
+                foundCount++;
+                updateCounts();
+                
+                // 添加庆祝动画
+                createConfetti(cardElement);
+                
+                if (foundCount >= GAME_CONFIG.targetCount) {
+                    setTimeout(() => completeGame(true), 500);
+                } else {
+                    setTimeout(() => {
+                        cardElement.classList.remove('selected');
+                    }, 300);
+                }
+            } else {
+                playSound('wrong');
+                cardElement.classList.add('wrong');
+                errorCount++;
+                updateCounts();
+                
+                if (errorCount >= GAME_CONFIG.maxErrors) {
+                    setTimeout(() => gameFailed(), 500);
+                } else {
+                    setTimeout(() => {
+                        cardElement.classList.remove('selected', 'wrong');
+                    }, 1000);
+                }
+            }
+        }
+
+        function createConfetti(element) {
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffd700', '#f093fb', '#fed6e3'];
+            for (let i = 0; i < 8; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.width = '8px';
+                confetti.style.height = '8px';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.borderRadius = '50%';
+                confetti.style.pointerEvents = 'none';
+                confetti.style.zIndex = '9999';
+                
+                const rect = element.getBoundingClientRect();
+                confetti.style.left = rect.left + rect.width / 2 + 'px';
+                confetti.style.top = rect.top + rect.height / 2 + 'px';
+                
+                document.body.appendChild(confetti);
+                
+                const angle = (Math.PI * 2 * i) / 8;
+                const velocity = 50 + Math.random() * 50;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
+                
+                let x = 0, y = 0;
+                const animate = () => {
+                    y += 2;
+                    x += vx * 0.02;
+                    confetti.style.transform = `translate(${x}px, ${y}px)`;
+                    confetti.style.opacity = 1 - y / 200;
+                    
+                    if (y < 200) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        confetti.remove();
+                    }
+                };
+                animate();
+            }
+        }
+
+        function updateCounts() {
+            document.getElementById('foundCount').textContent = foundCount;
+            document.getElementById('errorCount').textContent = errorCount;
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                document.getElementById('timer').textContent = `⏱️ ${elapsed}秒`;
+            }, 1000);
+        }
+
+        function completeGame(success) {
+            if (gameCompleted) return;
+            gameCompleted = true;
+            
+            clearInterval(timerInterval);
+            const timeUsed = Math.floor((Date.now() - startTime) / 1000);
+            
+            let stars = 3;
+            if (timeUsed > 60 || errorCount >= 2) stars = 1;
+            else if (timeUsed > 45 || errorCount >= 1) stars = 2;
+            
+            updateLevelProgress(GAME_CONFIG.game, GAME_CONFIG.level, stars);
+            
+            playSound('win');
+            document.getElementById('starRating').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+            document.getElementById('timeUsed').textContent = `用时: ${timeUsed}秒`;
+            
+            // 全屏庆祝效果
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    createScreenConfetti();
+                }, i * 100);
+            }
+            
+            setTimeout(() => {
+                showModal('resultModal');
+            }, 1500);
+        }
+
+        function createScreenConfetti() {
+            const confetti = document.createElement('div');
+            confetti.textContent = ['🎉', '🎊', '⭐', '🌟', '✨'][Math.floor(Math.random() * 5)];
+            confetti.style.position = 'fixed';
+            confetti.style.fontSize = '24px';
+            confetti.style.left = Math.random() * window.innerWidth + 'px';
+            confetti.style.top = '-50px';
+            confetti.style.pointerEvents = 'none';
+            confetti.style.zIndex = '9999';
+            document.body.appendChild(confetti);
+            
+            let y = -50;
+            const speed = 2 + Math.random() * 3;
+            const swing = Math.random() * 100 - 50;
+            
+            const animate = () => {
+                y += speed;
+                confetti.style.top = y + 'px';
+                confetti.style.transform = `translateX(${Math.sin(y / 30) * swing}px) rotate(${y}deg)`;
+                
+                if (y < window.innerHeight) {
+                    requestAnimationFrame(animate);
+                } else {
+                    confetti.remove();
+                }
+            };
+            animate();
+        }
+
+        function gameFailed() {
+            gameCompleted = true;
+            clearInterval(timerInterval);
+            showModal('failModal');
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>
+

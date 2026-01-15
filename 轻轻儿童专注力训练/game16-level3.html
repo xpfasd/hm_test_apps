@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第3关 - 拖拽归类</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body{background:linear-gradient(135deg,#e8f5e9 0%,#fff9c4 100%);}
+        .classify-area{max-width:420px;margin:15px auto;background:#fff;border-radius:18px;box-shadow:0 2px 16px #c8e6c980;padding:14px 6px;}
+        .categories{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:10px 0;}
+        .category-box{min-height:75px;border:3px dashed#66bb6a;border-radius:10px;padding:6px 2px;text-align:center;background:#f1f8e9;}
+        .category-title{font-size:14px;font-weight:bold;color:#558b2f;margin-bottom:4px;}
+        .items-pool{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:15px;}
+        .item{width:100%;aspect-ratio:1;border-radius:8px;background:#fff;box-shadow:0 2px 8px #ddd;display:flex;align-items:center;justify-content:center;font-size:28px;cursor:move;transition:.2s;}
+        .item:active{transform:scale(0.86);opacity:0.7;}
+        .item.placed{opacity:0.4;cursor:not-allowed;}
+        .check-btn{width:85%;margin:11px auto 0;display:block;padding:8px;background:#aed581;border:none;border-radius:10px;font-size:15px;font-weight:bold;color:#33691e;cursor:pointer;box-shadow:0 2px 4px #9ccc65;}
+    </style>
+</head>
+<body class="game-page">
+<div class="container">
+    <div class="game-header">
+        <div class="back-btn" onclick="goHome()">⬅️</div>
+        <div class="game-info"><div class="level-title">拖拽归类 • 第3关</div><div class="timer" id="timer">⏱️ 0秒</div></div>
+    </div>
+    <div class="game-area">
+        <div class="game-instruction">4种分类！把动物和食物分好！</div>
+        <div class="classify-area">
+            <div class="categories">
+                <div class="category-box"><div class="category-title">🐾动物</div><div class="drop-zone" id="animalZone"></div></div>
+                <div class="category-box"><div class="category-title">🍎水果</div><div class="drop-zone" id="fruitZone"></div></div>
+                <div class="category-box"><div class="category-title">🥕蔬菜</div><div class="drop-zone" id="vegZone"></div></div>
+                <div class="category-box"><div class="category-title">🍰甜点</div><div class="drop-zone" id="dessertZone"></div></div>
+            </div>
+            <div class="items-pool" id="itemsPool"></div>
+            <button class="check-btn" onclick="checkResult()">✅ 检查答案</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="resultModal">
+    <div class="modal-content"><h2 id="resultTitle"></h2>
+        <div class="star-rating" id="starRating">⭐⭐⭐</div>
+        <p id="resultMsg"></p>
+        <p id="timeUsed"></p>
+        <div><button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button><button class="btn btn-primary" onclick="nextLevel('game16',3)">➡️ 下一关</button></div>
+    </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+const items=[{emoji:'🐶',cat:'animal'},{emoji:'🍎',cat:'fruit'},{emoji:'🥕',cat:'veg'},{emoji:'🍰',cat:'dessert'},{emoji:'🐱',cat:'animal'},{emoji:'🍌',cat:'fruit'},{emoji:'🥦',cat:'veg'},{emoji:'🍩',cat:'dessert'},{emoji:'🐰',cat:'animal'},{emoji:'🍇',cat:'fruit'},{emoji:'🌽',cat:'veg'},{emoji:'🧁',cat:'dessert'}];
+let placements={},startTime,timerInt,dragEl=null,dragIdx=null;
+function shuffle(arr){return arr.sort(()=>Math.random()-.5)}
+function renderItems(){let pool=document.getElementById('itemsPool');pool.innerHTML='';shuffle(items).forEach((item,idx)=>{let div=document.createElement('div');div.className='item';div.textContent=item.emoji;div.draggable=true;div.dataset.idx=idx;div.ondragstart=(e)=>{dragEl=div;dragIdx=idx;e.dataTransfer.effectAllowed='move';};div.ondragend=()=>{dragEl=null;dragIdx=null;};pool.appendChild(div);});}
+function setupDropZones(){['animalZone','fruitZone','vegZone','dessertZone'].forEach(id=>{let zone=document.getElementById(id);zone.ondragover=(e)=>{e.preventDefault();e.dataTransfer.dropEffect='move';};zone.ondrop=(e)=>{e.preventDefault();if(dragEl){let cat=id.replace('Zone','');zone.appendChild(dragEl);dragEl.classList.add('placed');placements[dragIdx]=cat;playSound('click');}}});}
+function checkResult(){let correct=0,wrong=0;items.forEach((item,idx)=>{if(placements[idx]===item.cat)correct++;else if(placements[idx])wrong++;});let used=Math.floor((Date.now()-startTime)/1000),stars=3;if(wrong>0||correct<items.length){showFinal(false,used,1);return;}if(used>32)stars=1;else if(used>20)stars=2;showFinal(true,used,stars);updateLevelProgress('game16',3,stars);}
+function showFinal(ok,used,stars){showModal('resultModal');document.getElementById('resultTitle').textContent=ok?'🎉 分类能手！':'😵 检查下';document.getElementById('resultMsg').textContent=ok?'全部分对！':'有些分错啦~';document.getElementById('starRating').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);document.getElementById('timeUsed').textContent=`用时: ${used}秒`;playSound(ok?'win':'wrong');}
+window.onload=function(){renderItems();setupDropZones();placements={};startTime=Date.now();if(timerInt)clearInterval(timerInt);timerInt=setInterval(()=>{document.getElementById('timer').textContent=`⏱️ ${Math.floor((Date.now()-startTime)/1000)}秒`;},1000);}
+</script>
+</body>
+</html>
+

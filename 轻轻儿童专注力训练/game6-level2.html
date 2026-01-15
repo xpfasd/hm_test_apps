@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第2关 - 连连看</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .match-grid {display:grid;grid-template-columns:repeat(4,1fr);gap:13px;max-width:360px;margin:18px auto;}
+        .match-card {background:linear-gradient(135deg,#a8edea,#fed6e3);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:46px;cursor:pointer;border:5px solid transparent;aspect-ratio:1;transition:all .25s;}
+        .match-card.selected {border-color:#00b894;transform:scale(1.08);box-shadow:0 0 15px #00b894aa;}
+        .match-card.matched {background:linear-gradient(135deg,#55efc4,#00b894);animation:bounce .6s;opacity:.6;pointer-events:none;}
+        .match-card.wrong {border-color:#e17055;animation:shake .5s;}
+    </style>
+</head>
+<body class="game-page">
+    <div class="container">
+        <div class="game-header"><div class="back-btn" onclick="goHome()">⬅️</div>
+            <div class="game-info"><div class="level-title">连连看 • 第 2 关</div><div class="timer" id="timer">⏱️ 0秒</div></div>
+        </div>
+        <div class="game-area">
+            <div class="game-instruction">找出<strong>两两相同</strong>的小动物配对！</div>
+            <div style="text-align:center;margin:12px 0;font-size:18px;color:#666;">已配对 <b id="pairsFound" style="color:#00b894;font-size:24px;">0</b> / <b id="totalPairs">0</b></div>
+            <div class="match-grid" id="matchGrid"></div>
+        </div>
+    </div>
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <h2>🎉 太棒了!</h2>
+            <div class="star-rating" id="starRating">⭐⭐⭐</div>
+            <p>全部配对成功！记忆力真棒！</p>
+            <p id="timeUsed">用时: 0秒</p>
+            <p id="resultTips" style="margin-top:15px;padding:10px;background:#fff3cd;border-radius:8px;font-size:14px;line-height:1.6;color:#856404;"></p>
+            <div>
+                <button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button>
+                <button class="btn btn-primary" onclick="nextLevel('game6',2)">➡️ 下一关</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+    <script>
+    const ANIMALS=['🐶','🐱','🐰','🦊','🐻','🐼'];
+    let cards=[],selected=[],matched=0,totalPairs=0,timerInterval,startTime,errorCount=0;
+    function initGame(){
+      startTime=Date.now();matched=0;selected=[];errorCount=0;
+      cards=[];
+      ANIMALS.forEach(a=>{cards.push(a,a);});
+      cards.sort(()=>Math.random()-.5);
+      totalPairs=ANIMALS.length;
+      document.getElementById('pairsFound').textContent=0;
+      document.getElementById('totalPairs').textContent=totalPairs;
+      renderCards();
+      startTimer();
+    }
+    function renderCards(){
+      let grid=document.getElementById('matchGrid');
+      grid.innerHTML='';
+      cards.forEach((animal,idx)=>{
+        let div=document.createElement('div');
+        div.className='match-card';
+        div.textContent=animal;
+        div.dataset.idx=idx;
+        div.dataset.animal=animal;
+        div.onclick=()=>selectCard(div,idx,animal);
+        grid.appendChild(div);
+      });
+    }
+    function selectCard(card,idx,animal){
+      if(card.classList.contains('matched')||card.classList.contains('selected')||selected.length>=2)return;
+      playSound('click');
+      card.classList.add('selected');
+      selected.push({card,idx,animal});
+      if(selected.length===2){
+        setTimeout(()=>checkMatch(),500);
+      }
+    }
+    function checkMatch(){
+      let[a,b]=selected;
+      if(a.animal===b.animal&&a.idx!==b.idx){
+        playSound('correct');
+        a.card.classList.remove('selected');
+        b.card.classList.remove('selected');
+        a.card.classList.add('matched');
+        b.card.classList.add('matched');
+        matched++;
+        document.getElementById('pairsFound').textContent=matched;
+        if(matched===totalPairs)setTimeout(()=>passGame(),400);
+      }else{
+        playSound('wrong');
+        a.card.classList.add('wrong');
+        b.card.classList.add('wrong');
+        errorCount++;
+        setTimeout(()=>{
+          a.card.classList.remove('selected','wrong');
+          b.card.classList.remove('selected','wrong');
+        },700);
+      }
+      selected=[];
+    }
+    function startTimer(){timerInterval=setInterval(()=>{let t=Math.floor((Date.now()-startTime)/1000);document.getElementById('timer').textContent=`⏱️ ${t}秒`;},1000);}
+    function passGame(){
+      clearInterval(timerInterval);
+      let used=Math.floor((Date.now()-startTime)/1000),stars=3;
+      if(used>50||errorCount>=6)stars=1;else if(used>35||errorCount>=4)stars=2;
+      updateLevelProgress('game6',2,stars);
+      playSound('win');
+      document.getElementById('starRating').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+      document.getElementById('timeUsed').textContent=`用时: ${used}秒`;
+      showModal('resultModal');
+    }
+    window.onload=initGame;
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第2关 - 快速反应</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body{background:linear-gradient(135deg,#fff3e0 0%,#e1f5fe 100%);}
+        .reaction-area{max-width:380px;margin:20px auto;background:#fff;border-radius:18px;box-shadow:0 2px 16px #ff980080;padding:20px 10px;text-align:center;}
+        .target-zone{width:180px;height:180px;margin:18px auto;border-radius:50%;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:70px;cursor:pointer;transition:all .2s;box-shadow:0 2px 10px #ddd;}
+        .target-zone.active{background:#4caf50;transform:scale(1.15);box-shadow:0 4px 20px #66bb6a;}
+        .tip{margin:12px 0;font-size:15px;color:#666;font-weight:bold;}
+        .score{font-size:17px;color:#388e3c;font-weight:bold;margin-top:12px;}
+    </style>
+</head>
+<body class="game-page">
+<div class="container">
+    <div class="game-header">
+        <div class="back-btn" onclick="goHome()">⬅️</div>
+        <div class="game-info"><div class="level-title">快速反应 • 第2关</div><div class="timer" id="timer">⏱️ 0秒</div></div>
+    </div>
+    <div class="game-area">
+        <div class="game-instruction">圆圈变绿时快速点击！次数增加！</div>
+        <div class="reaction-area">
+            <div class="tip" id="tip">准备...</div>
+            <div class="target-zone" id="target">🐸</div>
+            <div class="score" id="score">点击次数：0/8</div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="resultModal">
+    <div class="modal-content"><h2 id="resultTitle">⚡ 反应测试完成！</h2>
+        <div class="star-rating" id="starRating">⭐⭐⭐</div>
+        <p id="resultMsg"></p>
+        <p id="avgTime"></p>
+        <div><button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button><button class="btn btn-primary" onclick="nextLevel('game15',2)">➡️ 下一关</button></div>
+    </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+let clickCnt=0,times=[],startTime,isActive=false,nextTimeout;
+function activate(){isActive=true;startTime=Date.now();document.getElementById('target').classList.add('active');document.getElementById('tip').textContent='快点！';}
+function scheduleNext(){nextTimeout=setTimeout(()=>{if(clickCnt>=8)return;activate();},Math.random()*2200+1300);}
+function targetClick(){if(!isActive)return;isActive=false;let rt=Date.now()-startTime;times.push(rt);clickCnt++;playSound('correct');document.getElementById('target').classList.remove('active');document.getElementById('score').textContent=`点击次数：${clickCnt}/8`;document.getElementById('tip').textContent='等待...';if(clickCnt>=8){setTimeout(showResult,800);}else{scheduleNext();}}
+function showResult(){let avg=Math.round(times.reduce((a,b)=>a+b,0)/times.length);let stars=3;if(avg>750)stars=1;else if(avg>480)stars=2;updateLevelProgress('game15',2,stars);document.getElementById('starRating').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);document.getElementById('resultMsg').textContent=`平均反应：${avg}毫秒`;document.getElementById('avgTime').textContent=stars===3?'超级快！':stars===2?'很不错！':'继续加油~';showModal('resultModal');playSound('win');}
+window.onload=function(){document.getElementById('target').onclick=targetClick;scheduleNext();}
+</script>
+</body>
+</html>
+

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>弹窗测试页面</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            padding: 20px;
+        }
+        .test-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .test-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .test-btn:hover {
+            transform: scale(1.05);
+        }
+        .test-alert {
+            background: #2196F3;
+            color: white;
+        }
+        .test-success {
+            background: #4CAF50;
+            color: white;
+        }
+        .test-report {
+            background: #FF9800;
+            color: white;
+        }
+        h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="text-align: center; color: #667eea;">🔧 弹窗系统测试</h1>
+        
+        <div class="section">
+            <h2>1. 测试弹窗功能</h2>
+            <p>点击下面的按钮测试不同类型的弹窗：</p>
+            <div class="test-buttons">
+                <button class="test-btn test-alert" onclick="testAlert()">测试提示弹窗</button>
+                <button class="test-btn test-success" onclick="testSuccess()">测试成功弹窗</button>
+                <button class="test-btn test-report" onclick="showReportModal()">测试举报弹窗</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2>2. 返回按钮样式预览</h2>
+            <p>新的返回按钮样式：</p>
+            <button class="back-btn">← 返回</button>
+        </div>
+        
+        <div class="section">
+            <h2>3. 举报按钮样式预览</h2>
+            <p>新的举报按钮样式：</p>
+            <button class="report-btn">
+                <span class="report-icon">📢</span>
+                <span>问题举报</span>
+            </button>
+        </div>
+        
+        <div class="section">
+            <h2>4. 功能说明</h2>
+            <ul style="line-height: 1.8;">
+                <li>✅ 自定义弹窗替代系统alert</li>
+                <li>✅ 支持多种弹窗类型（提示、成功、举报）</li>
+                <li>✅ 点击背景或ESC键关闭弹窗</li>
+                <li>✅ 举报内容保存到本地存储</li>
+                <li>✅ 返回按钮更加醒目（红色渐变）</li>
+            </ul>
+        </div>
+        
+        <div class="section">
+            <h2>5. 开发者工具</h2>
+            <div class="test-buttons">
+                <button class="test-btn" style="background: #9C27B0; color: white;" onclick="viewReports()">查看所有反馈</button>
+                <button class="test-btn" style="background: #F44336; color: white;" onclick="clearReports()">清除所有反馈</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义弹窗容器（复制自index.html） -->
+    <div id="modalContainer" class="modal-container">
+        <!-- 通用提示弹窗 -->
+        <div id="alertModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="alertTitle">提示</h3>
+                    <button class="modal-close" onclick="closeModal('alertModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="alertMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-primary" onclick="closeModal('alertModal')">确定</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 举报反馈弹窗 -->
+        <div id="reportModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>问题举报</h3>
+                    <button class="modal-close" onclick="closeModal('reportModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>问题类型：</label>
+                        <select id="reportType" class="form-control">
+                            <option value="">请选择问题类型</option>
+                            <option value="bug">程序错误</option>
+                            <option value="content">内容问题</option>
+                            <option value="suggestion">功能建议</option>
+                            <option value="other">其他问题</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>反馈内容：</label>
+                        <textarea id="reportContent" class="form-control" rows="5" placeholder="请详细描述您的问题或建议..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>联系方式（选填）：</label>
+                        <input type="text" id="reportContact" class="form-control" placeholder="您的邮箱或电话">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-secondary" onclick="closeModal('reportModal')">取消</button>
+                    <button class="modal-btn modal-btn-primary" onclick="submitReport()">提交</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 成功提示弹窗 -->
+        <div id="successModal" class="modal">
+            <div class="modal-content modal-success">
+                <div class="modal-icon">✅</div>
+                <h3 id="successTitle">操作成功</h3>
+                <p id="successMessage">您的反馈已成功提交！</p>
+                <button class="modal-btn modal-btn-primary" onclick="closeModal('successModal')">好的</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/modal.js"></script>
+    <script>
+        // 测试提示弹窗
+        function testAlert() {
+            showAlert('这是一个自定义提示弹窗，替代了系统的alert！', '测试提示');
+        }
+        
+        // 测试成功弹窗
+        function testSuccess() {
+            showSuccess('恭喜！操作已成功完成。', '测试成功');
+        }
+        
+        // 查看反馈
+        function viewReports() {
+            const reports = viewAllReports();
+            if (reports.length === 0) {
+                showAlert('暂无反馈记录', '查看反馈');
+            } else {
+                console.log('所有反馈记录：', reports);
+                showAlert(`共有 ${reports.length} 条反馈记录，请在控制台查看详情`, '查看反馈');
+            }
+        }
+        
+        // 清除反馈
+        function clearReports() {
+            if (confirm('确定要清除所有反馈记录吗？')) {
+                clearAllReports();
+                showSuccess('所有反馈记录已清除', '清除成功');
+            }
+        }
+    </script>
+</body>
+</html>

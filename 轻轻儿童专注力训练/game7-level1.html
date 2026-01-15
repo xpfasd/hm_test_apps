@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第1关 - 排序小动物</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .sort-container {max-width:360px;margin:20px auto;}
+        .sort-instruction {text-align:center;font-size:20px;color:#666;margin-bottom:20px;}
+        .animals-list {display:flex;flex-direction:column;gap:12px;}
+        .animal-item {background:linear-gradient(135deg,#a8edea,#fed6e3);border-radius:18px;padding:15px 20px;display:flex;align-items:center;gap:15px;cursor:move;border:3px solid transparent;transition:all .2s;user-select:none;}
+        .animal-item.dragging {opacity:.5;border-color:#00b894;}
+        .animal-item .emoji {font-size:40px;}
+        .animal-item .size-label {font-size:18px;color:#666;font-weight:bold;}
+        .check-btn {margin:20px auto 0;display:block;}
+    </style>
+</head>
+<body class="game-page">
+    <div class="container">
+        <div class="game-header"><div class="back-btn" onclick="goHome()">⬅️</div>
+            <div class="game-info"><div class="level-title">排序小动物 • 第 1 关</div><div class="timer" id="timer">⏱️ 0秒</div></div>
+        </div>
+        <div class="game-area">
+            <div class="game-instruction">按<strong>从小到大</strong>的顺序排列！</div>
+            <div class="sort-container">
+                <div class="sort-instruction">拖动小动物调整顺序</div>
+                <div class="animals-list" id="animalsList"></div>
+                <button class="btn btn-primary check-btn" onclick="checkOrder()">✓ 检查答案</button>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <h2>🎉 太棒了!</h2>
+            <div class="star-rating" id="starRating">⭐⭐⭐</div>
+            <p>排序完全正确！</p>
+            <p id="timeUsed">用时: 0秒</p>
+            <p id="resultTips" style="margin-top:15px;padding:10px;background:#fff3cd;border-radius:8px;font-size:14px;line-height:1.6;color:#856404;"></p>
+            <div>
+                <button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button>
+                <button class="btn btn-primary" onclick="nextLevel('game7',1)">➡️ 下一关</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+    <script>
+    const ANIMALS=[
+      {emoji:'🐁',size:1,label:'小老鼠'},
+      {emoji:'🐰',size:2,label:'中兔子'},
+      {emoji:'🐻',size:3,label:'大熊'}
+    ];
+    let currentOrder=[],correctOrder=[],timerInterval,startTime,errorCount=0;
+    function initGame(){
+      startTime=Date.now();errorCount=0;
+      correctOrder=ANIMALS.map(a=>a.size);
+      currentOrder=ANIMALS.map((a,i)=>i).sort(()=>Math.random()-.5);
+      renderAnimals();
+      startTimer();
+    }
+    function renderAnimals(){
+      let list=document.getElementById('animalsList');
+      list.innerHTML='';
+      currentOrder.forEach((idx,pos)=>{
+        let animal=ANIMALS[idx];
+        let div=document.createElement('div');
+        div.className='animal-item';
+        div.draggable=true;
+        div.dataset.idx=idx;
+        div.innerHTML=`<div class="emoji">${animal.emoji}</div><div class="size-label">${animal.label}</div>`;
+        div.addEventListener('dragstart',handleDragStart);
+        div.addEventListener('dragover',handleDragOver);
+        div.addEventListener('drop',handleDrop);
+        div.addEventListener('dragend',handleDragEnd);
+        list.appendChild(div);
+      });
+    }
+    let dragSrcEl=null;
+    function handleDragStart(e){
+      dragSrcEl=this;
+      this.classList.add('dragging');
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/html',this.innerHTML);
+    }
+    function handleDragOver(e){
+      if(e.preventDefault){e.preventDefault();}
+      e.dataTransfer.dropEffect='move';
+      return false;
+    }
+    function handleDrop(e){
+      if(e.stopPropagation){e.stopPropagation();}
+      if(dragSrcEl!==this){
+        let srcIdx=parseInt(dragSrcEl.dataset.idx);
+        let tgtIdx=parseInt(this.dataset.idx);
+        let srcPos=currentOrder.indexOf(srcIdx);
+        let tgtPos=currentOrder.indexOf(tgtIdx);
+        [currentOrder[srcPos],currentOrder[tgtPos]]=[currentOrder[tgtPos],currentOrder[srcPos]];
+        renderAnimals();
+        playSound('click');
+      }
+      return false;
+    }
+    function handleDragEnd(e){
+      this.classList.remove('dragging');
+    }
+    function checkOrder(){
+      let userOrder=currentOrder.map(idx=>ANIMALS[idx].size);
+      if(JSON.stringify(userOrder)===JSON.stringify(correctOrder)){
+        playSound('correct');
+        setTimeout(()=>passGame(),300);
+      }else{
+        playSound('wrong');
+        errorCount++;
+        alert('排序不对哦，再试试！');
+      }
+    }
+    function startTimer(){timerInterval=setInterval(()=>{let t=Math.floor((Date.now()-startTime)/1000);document.getElementById('timer').textContent=`⏱️ ${t}秒`;},1000);}
+    function passGame(){
+      clearInterval(timerInterval);
+      let used=Math.floor((Date.now()-startTime)/1000),stars=3;
+      if(used>40||errorCount>=3)stars=1;else if(used>25||errorCount>=2)stars=2;
+      updateLevelProgress('game7',1,stars);
+      playSound('win');
+      document.getElementById('starRating').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+      document.getElementById('timeUsed').textContent=`用时: ${used}秒`;
+      showModal('resultModal');
+    }
+    window.onload=initGame;
+    </script>
+</body>
+</html>

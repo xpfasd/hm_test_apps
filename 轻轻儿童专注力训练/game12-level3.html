@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第3关 - 指定颜色填色</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body{background:linear-gradient(135deg,#fff9e6 0%,#e3f5ff 100%);}
+        .paint-area{max-width:400px;margin:18px auto;background:#fff;border-radius:18px;box-shadow:0 2px 16px #e8c3f044;padding:14px 8px;}
+        .target-color{text-align:center;margin:8px 0;font-size:15px;font-weight:bold;color:#555;}
+        .color-demo{display:inline-block;width:32px;height:32px;border-radius:7px;box-shadow:0 1px 4px #ddd;vertical-align:middle;margin:0 5px;}
+        .shapes-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0;}
+        .shape-item{width:100%;aspect-ratio:1;border-radius:12px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:34px;cursor:pointer;transition:all .2s;box-shadow:0 1px 2px #ddd;}
+        .shape-item.painted{transform:scale(1.08);box-shadow:0 3px 9px #90caf9;}
+        .check-btn{width:85%;margin:12px auto 5px;display:block;padding:8px;background:#bbdefb;border:none;border-radius:10px;font-size:15px;font-weight:bold;color:#1565c0;cursor:pointer;box-shadow:0 2px 4px #90caf9;}
+        .check-btn:active{background:#90caf9;}
+    </style>
+</head>
+<body class="game-page">
+<div class="container">
+    <div class="game-header">
+        <div class="back-btn" onclick="goHome()">⬅️</div>
+        <div class="game-info"><div class="level-title">指定颜色填色 • 第3关</div><div class="timer" id="timer">⏱️ 0秒</div></div>
+    </div>
+    <div class="game-area">
+        <div class="game-instruction">点击所有<strong>蓝色</strong>的小动物涂色！</div>
+        <div class="paint-area">
+            <div class="target-color">目标颜色：<span class="color-demo" style="background:#64b5f6"></span>蓝色</div>
+            <div class="shapes-grid" id="shapesGrid"></div>
+            <button class="check-btn" onclick="checkResult()">✅ 提交检查</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="resultModal">
+    <div class="modal-content"><h2 id="resultTitle"></h2>
+        <div class="star-rating" id="starRating">⭐⭐⭐</div>
+        <p id="resultMsg"></p>
+        <p id="timeUsed"></p>
+        <div><button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button><button class="btn btn-primary" onclick="nextLevel('game12',3)">➡️ 下一关</button></div>
+    </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+const animals=[
+    {emoji:'🐋',color:'#64b5f6',isTarget:true},{emoji:'🐸',color:'#aed581',isTarget:false},{emoji:'🐟',color:'#64b5f6',isTarget:true},{emoji:'🦩',color:'#f48fb1',isTarget:false},
+    {emoji:'🐠',color:'#64b5f6',isTarget:true},{emoji:'🐛',color:'#aed581',isTarget:false},{emoji:'🐳',color:'#64b5f6',isTarget:true},{emoji:'🐷',color:'#f48fb1',isTarget:false},
+    {emoji:'🐡',color:'#64b5f6',isTarget:true},{emoji:'🦎',color:'#81c784',isTarget:false},{emoji:'🦈',color:'#64b5f6',isTarget:true},{emoji:'🐥',color:'#fff176',isTarget:false},
+];
+let painted=[],startTime,timerInt;
+function shuffle(arr){return arr.sort(()=>Math.random()-.5)}
+function renderShapes(){const grid=document.getElementById('shapesGrid');grid.innerHTML='';animals.forEach((item,idx)=>{let div=document.createElement('div');div.className='shape-item'+(painted.includes(idx)?' painted':'');div.style.background=painted.includes(idx)?item.color:'#f5f5f5';div.innerHTML=item.emoji;div.onclick=()=>togglePaint(idx);grid.appendChild(div);});}
+function togglePaint(idx){if(painted.includes(idx))painted=painted.filter(v=>v!==idx);else painted.push(idx);playSound('click');renderShapes();}
+function checkResult(){let correctCnt=0,wrongCnt=0;animals.forEach((item,idx)=>{if(item.isTarget&&painted.includes(idx))correctCnt++;if(!item.isTarget&&painted.includes(idx))wrongCnt++;if(item.isTarget&&!painted.includes(idx))wrongCnt++;});let used=Math.floor((Date.now()-startTime)/1000),stars=3;if(wrongCnt>0){showFinal(false,used,1);return;}if(used>30)stars=1;else if(used>18)stars=2;showFinal(true,used,stars);updateLevelProgress('game12',3,stars);}
+function showFinal(ok,used,stars){showModal('resultModal');document.getElementById('resultTitle').textContent=ok?'🎨 涂色能手！':'😅 再看看';document.getElementById('resultMsg').textContent=ok?'所有蓝色小动物都涂对了！':'还有蓝色动物没涂或涂错了！';document.getElementById('starRating').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);document.getElementById('timeUsed').textContent=`用时: ${used}秒`;playSound(ok?'win':'wrong');}
+window.onload=function(){shuffle(animals);painted=[];renderShapes();startTime=Date.now();if(timerInt)clearInterval(timerInt);timerInt=setInterval(()=>{let t=Math.floor((Date.now()-startTime)/1000);document.getElementById('timer').textContent=`⏱️ ${t}秒`;},1000);}
+</script>
+</body>
+</html>
+

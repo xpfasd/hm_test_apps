@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第2关 - 图形配对</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body{background:linear-gradient(135deg,#fff9c4 0%,#b2ebf2 100%);}
+        .match-area{max-width:380px;margin:20px auto;background:#fff;border-radius:18px;box-shadow:0 2px 16px #fff17680;padding:18px 8px;}
+        .pairs-container{display:flex;justify-content:space-around;margin:18px 0;}
+        .column{display:flex;flex-direction:column;gap:12px;}
+        .shape-item{width:75px;height:75px;border-radius:13px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:38px;cursor:pointer;transition:.2s;box-shadow:0 2px 8px #ddd;}
+        .shape-item:active{transform:scale(0.89);}
+        .shape-item.selected{background:#ffeb3b;box-shadow:0 3px 12px #ffd600;}
+        .shape-item.matched{background:#c8e6c9;opacity:0.6;cursor:not-allowed;}
+        .check-btn{width:88%;margin:13px auto 0;display:block;padding:9px;background:#ffecb3;border:none;border-radius:11px;font-size:16px;font-weight:bold;color:#ad7a00;cursor:pointer;box-shadow:0 2px 5px #ffd97a;}
+    </style>
+</head>
+<body class="game-page">
+<div class="container">
+    <div class="game-header">
+        <div class="back-btn" onclick="goHome()">⬅️</div>
+        <div class="game-info"><div class="level-title">图形配对 • 第2关</div><div class="timer" id="timer">⏱️ 0秒</div></div>
+    </div>
+    <div class="game-area">
+        <div class="game-instruction">更多图形！找到相同的配对！</div>
+        <div class="match-area">
+            <div class="pairs-container" id="pairsContainer"></div>
+            <button class="check-btn" onclick="checkResult()">✅ 检查答案</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="resultModal">
+    <div class="modal-content"><h2 id="resultTitle"></h2>
+        <div class="star-rating" id="starRating">⭐⭐⭐</div>
+        <p id="resultMsg"></p>
+        <p id="timeUsed"></p>
+        <div><button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button><button class="btn btn-primary" onclick="nextLevel('game19',2)">➡️ 下一关</button></div>
+    </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+const shapes=['🔴','🔵','🟢','🟡','🟠','🟣'];
+let leftSel=null,rightSel=null,matched=[],startTime,timerInt;
+function shuffle(arr){return arr.sort(()=>Math.random()-.5)}
+function renderPairs(){let container=document.getElementById('pairsContainer');container.innerHTML='';let leftCol=document.createElement('div');leftCol.className='column';let rightCol=document.createElement('div');rightCol.className='column';let leftShapes=shuffle([...shapes]),rightShapes=shuffle([...shapes]);leftShapes.forEach((s,i)=>{let div=document.createElement('div');div.className='shape-item';div.textContent=s;div.dataset.idx=i;div.dataset.side='left';div.onclick=()=>selectItem('left',i,div);leftCol.appendChild(div);});rightShapes.forEach((s,i)=>{let div=document.createElement('div');div.className='shape-item';div.textContent=s;div.dataset.idx=i;div.dataset.side='right';div.onclick=()=>selectItem('right',i,div);rightCol.appendChild(div);});container.appendChild(leftCol);container.appendChild(rightCol);}
+function selectItem(side,idx,dom){if(dom.classList.contains('matched'))return;if(side==='left'){if(leftSel)leftSel.classList.remove('selected');leftSel=dom;leftSel.classList.add('selected');}else{if(rightSel)rightSel.classList.remove('selected');rightSel=dom;rightSel.classList.add('selected');}if(leftSel&&rightSel){if(leftSel.textContent===rightSel.textContent){leftSel.classList.add('matched');rightSel.classList.add('matched');matched.push({left:leftSel.dataset.idx,right:rightSel.dataset.idx});playSound('correct');leftSel=null;rightSel=null;}}}
+function checkResult(){let used=Math.floor((Date.now()-startTime)/1000),stars=3;if(matched.length<shapes.length){showFinal(false,used,1);return;}if(used>30)stars=1;else if(used>20)stars=2;showFinal(true,used,stars);updateLevelProgress('game19',2,stars);}
+function showFinal(ok,used,stars){showModal('resultModal');document.getElementById('resultTitle').textContent=ok?'🎉 太棒了！':'😅 加油';document.getElementById('resultMsg').textContent=ok?'全部配对成功！':'还有图形没配对~';document.getElementById('starRating').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);document.getElementById('timeUsed').textContent=`用时: ${used}秒`;playSound(ok?'win':'wrong');}
+window.onload=function(){renderPairs();startTime=Date.now();if(timerInt)clearInterval(timerInt);timerInt=setInterval(()=>{document.getElementById('timer').textContent=`⏱️ ${Math.floor((Date.now()-startTime)/1000)}秒`;},1000);}
+</script>
+</body>
+</html>
+

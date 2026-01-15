@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>轻轻加减乘除</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/features.css">
+    <link rel="stylesheet" href="css/games.css">
+    <link rel="stylesheet" href="css/games-extended.css">
+</head>
+<body>
+    <div id="app">
+        <!-- 顶部导航栏 -->
+        <div class="top-nav">
+            <div class="nav-left">
+                <div class="user-avatar" onclick="showUserProfile()">
+                    <img id="userAvatar" src="" alt="">
+                    <span id="userAvatarEmoji">👦</span>
+                </div>
+                <div class="user-info">
+                    <div class="user-name" id="userName">小朋友</div>
+                    <div class="user-level">Lv.<span id="userLevel">1</span> 数学新手</div>
+                </div>
+            </div>
+            <div class="nav-center">
+                <div class="exp-bar">
+                    <div class="exp-fill" id="expBar" style="width: 0%"></div>
+                    <div class="exp-text"><span id="currentExp">0</span> / <span id="nextExp">100</span> EXP</div>
+                </div>
+            </div>
+            <div class="nav-right">
+                <button class="nav-btn" onclick="showThemeSelector()">🎨</button>
+                <button class="nav-btn" onclick="showSettings()">⚙️</button>
+                <button class="nav-btn notification" onclick="showDailyTasks()">
+                    <span>📅</span>
+                    <span class="badge" id="taskBadge">!</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- 首页 -->
+        <div id="homePage" class="page active">
+            <div class="header">
+                <h1>🌟 数学小天才 🌟</h1>
+                <div class="subtitle">快乐学习加减乘除</div>
+            </div>
+            
+            <div class="operations-grid">
+                <div class="operation-card addition" onclick="startPractice('addition')">
+                    <div class="icon">➕</div>
+                    <div class="title">加法练习</div>
+                    <div class="desc">学习加法运算</div>
+                </div>
+                
+                <div class="operation-card subtraction" onclick="startPractice('subtraction')">
+                    <div class="icon">➖</div>
+                    <div class="title">减法练习</div>
+                    <div class="desc">学习减法运算</div>
+                </div>
+                
+                <div class="operation-card multiplication" onclick="startPractice('multiplication')">
+                    <div class="icon">✖️</div>
+                    <div class="title">乘法练习</div>
+                    <div class="desc">学习乘法运算</div>
+                </div>
+                
+                <div class="operation-card division" onclick="startPractice('division')">
+                    <div class="icon">➗</div>
+                    <div class="title">除法练习</div>
+                    <div class="desc">学习除法运算</div>
+                </div>
+            </div>
+            
+            <!-- 功能模块区 -->
+            <div class="feature-section">
+                <h3 class="section-title">🎯 学习中心</h3>
+                <div class="feature-grid">
+                    <div class="feature-card" onclick="showChallengeMode()">
+                        <div class="feature-icon">⚡</div>
+                        <div class="feature-name">挑战模式</div>
+                        <div class="feature-desc">限时答题赢奖励</div>
+                    </div>
+                    <div class="feature-card" onclick="showWrongBook()">
+                        <div class="feature-icon">📝</div>
+                        <div class="feature-name">错题本</div>
+                        <div class="feature-desc">复习错题提高成绩</div>
+                        <div class="feature-badge" id="wrongCount">0</div>
+                    </div>
+                    <div class="feature-card" onclick="showStatistics()">
+                        <div class="feature-icon">📊</div>
+                        <div class="feature-name">学习统计</div>
+                        <div class="feature-desc">查看学习报告</div>
+                    </div>
+                    <div class="feature-card" onclick="showAchievements()">
+                        <div class="feature-icon">🏆</div>
+                        <div class="feature-name">成就徽章</div>
+                        <div class="feature-desc">收集所有徽章</div>
+                        <div class="feature-badge" id="achievementCount">0/20</div>
+                    </div>
+                    <div class="feature-card" onclick="showRankings()">
+                        <div class="feature-icon">🥇</div>
+                        <div class="feature-name">排行榜</div>
+                        <div class="feature-desc">查看学习排名</div>
+                    </div>
+                    <div class="feature-card" onclick="showDailyTasks()">
+                        <div class="feature-icon">✅</div>
+                        <div class="feature-name">每日任务</div>
+                        <div class="feature-desc">完成任务得奖励</div>
+                        <div class="feature-badge new" id="newTaskCount">3</div>
+                    </div>
+                    <div class="feature-card special" onclick="showMathGames()">
+                        <div class="feature-icon">🎮</div>
+                        <div class="feature-name">数学小游戏</div>
+                        <div class="feature-desc">30个趣味游戏</div>
+                        <div class="feature-badge hot">HOT</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="report-button-container">
+                <button class="report-btn" onclick="showReportModal()">
+                    <span class="report-icon">📢</span>
+                    <span>问题举报</span>
+                </button>
+            </div>
+            
+            <div class="progress-overview">
+                <h3>学习进度</h3>
+                <div class="progress-bars">
+                    <div class="progress-item">
+                        <span>加法</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill addition-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text">0/100</span>
+                    </div>
+                    <div class="progress-item">
+                        <span>减法</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill subtraction-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text">0/100</span>
+                    </div>
+                    <div class="progress-item">
+                        <span>乘法</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill multiplication-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text">0/100</span>
+                    </div>
+                    <div class="progress-item">
+                        <span>除法</span>
+                        <div class="progress-bar">
+                            <div class="progress-fill division-progress" style="width: 0%"></div>
+                        </div>
+                        <span class="progress-text">0/100</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 类别选择页 -->
+        <div id="categoryPage" class="page">
+            <div class="header">
+                <button class="back-btn" onclick="goBack()">← 返回</button>
+                <h2 id="categoryTitle">选择练习类型</h2>
+            </div>
+            
+            <div id="categoryGrid" class="category-grid">
+                <!-- 动态生成类别 -->
+            </div>
+        </div>
+
+        <!-- 练习页 -->
+        <div id="practicePage" class="page">
+            <div class="practice-header">
+                <button class="back-btn" onclick="goToCategories()">← 返回</button>
+                <div class="question-counter">
+                    <span id="currentQuestion">1</span> / 100
+                </div>
+                <div class="score">
+                    得分: <span id="score">0</span>
+                </div>
+            </div>
+            
+            <div class="question-area">
+                <div id="questionDisplay" class="question-display">
+                    <!-- 题目显示区域 -->
+                </div>
+                
+                <div class="answer-area">
+                    <input type="number" id="answerInput" placeholder="输入答案" autocomplete="off">
+                    <button id="submitBtn" onclick="checkAnswer()">提交答案</button>
+                </div>
+                
+                <div id="feedback" class="feedback hidden">
+                    <!-- 反馈信息 -->
+                </div>
+            </div>
+            
+            <!-- 动画演示区域 -->
+            <div id="animationArea" class="animation-area">
+                <!-- 动画内容 -->
+            </div>
+        </div>
+
+        <!-- 挑战模式页 -->
+        <div id="challengePage" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goHome()">← 返回</button>
+                <h2>⚡ 挑战模式</h2>
+            </div>
+            <div class="challenge-content">
+                <div class="challenge-modes">
+                    <div class="challenge-card" onclick="startTimeChallenge(60)">
+                        <div class="challenge-icon">⏱️</div>
+                        <h3>一分钟挑战</h3>
+                        <p>60秒内答对尽可能多的题目</p>
+                        <div class="best-record">最佳记录: <span id="best60">0</span> 题</div>
+                    </div>
+                    <div class="challenge-card" onclick="startTimeChallenge(180)">
+                        <div class="challenge-icon">⏰</div>
+                        <h3>三分钟挑战</h3>
+                        <p>180秒内答对尽可能多的题目</p>
+                        <div class="best-record">最佳记录: <span id="best180">0</span> 题</div>
+                    </div>
+                    <div class="challenge-card" onclick="startSurvivalChallenge()">
+                        <div class="challenge-icon">💪</div>
+                        <h3>生存模式</h3>
+                        <p>答错即结束，看你能坚持多久</p>
+                        <div class="best-record">最佳记录: <span id="bestSurvival">0</span> 题</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 错题本页 -->
+        <div id="wrongBookPage" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goHome()">← 返回</button>
+                <h2>📝 错题本</h2>
+            </div>
+            <div class="wrong-book-content">
+                <div class="wrong-stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalWrong">0</div>
+                        <div class="stat-label">总错题数</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="reviewedWrong">0</div>
+                        <div class="stat-label">已复习</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="masteredWrong">0</div>
+                        <div class="stat-label">已掌握</div>
+                    </div>
+                </div>
+                <div class="wrong-list" id="wrongList">
+                    <!-- 错题列表动态生成 -->
+                </div>
+                <!-- 复习功能已隐藏 -->
+                <!-- <button class="btn-primary full-width" onclick="startWrongReview()">开始复习错题</button> -->
+            </div>
+        </div>
+        
+        <!-- 学习统计页 -->
+        <div id="statisticsPage" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goHome()">← 返回</button>
+                <h2>📊 学习统计</h2>
+            </div>
+            <div class="statistics-content">
+                <div class="stat-overview">
+                    <div class="stat-item">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-value" id="totalQuestions">0</div>
+                        <div class="stat-name">总答题数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-value" id="correctRate">0%</div>
+                        <div class="stat-name">正确率</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-value" id="studyStreak">0</div>
+                        <div class="stat-name">连续学习天数</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-value" id="studyTime">0</div>
+                        <div class="stat-name">学习时长(分钟)</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>本周学习情况</h3>
+                    <div id="weeklyChart" class="chart">
+                        <!-- 图表动态生成 -->
+                    </div>
+                </div>
+                <div class="operation-stats">
+                    <h3>各运算掌握情况</h3>
+                    <div class="operation-bars">
+                        <div class="op-stat">
+                            <span>加法</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill addition-stat" style="width: 0%"></div>
+                            </div>
+                            <span class="stat-percent">0%</span>
+                        </div>
+                        <div class="op-stat">
+                            <span>减法</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill subtraction-stat" style="width: 0%"></div>
+                            </div>
+                            <span class="stat-percent">0%</span>
+                        </div>
+                        <div class="op-stat">
+                            <span>乘法</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill multiplication-stat" style="width: 0%"></div>
+                            </div>
+                            <span class="stat-percent">0%</span>
+                        </div>
+                        <div class="op-stat">
+                            <span>除法</span>
+                            <div class="stat-bar">
+                                <div class="stat-fill division-stat" style="width: 0%"></div>
+                            </div>
+                            <span class="stat-percent">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 成就页 -->
+        <div id="achievementsPage" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goHome()">← 返回</button>
+                <h2>🏆 成就徽章</h2>
+            </div>
+            <div class="achievements-content">
+                <div class="achievement-progress">
+                    <div class="progress-circle">
+                        <svg width="120" height="120">
+                            <circle cx="60" cy="60" r="50" stroke="#e0e0e0" stroke-width="10" fill="none"/>
+                            <circle cx="60" cy="60" r="50" stroke="#667eea" stroke-width="10" fill="none"
+                                stroke-dasharray="314" stroke-dashoffset="314" id="achievementCircle"/>
+                        </svg>
+                        <div class="progress-text">
+                            <span id="achievementPercent">0</span>%
+                        </div>
+                    </div>
+                    <p>已解锁 <span id="unlockedCount">0</span> / <span id="totalAchievements">20</span> 个成就</p>
+                </div>
+                <div class="achievement-grid" id="achievementGrid">
+                    <!-- 成就徽章动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 排行榜页 -->
+        <div id="rankingsPage" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goHome()">← 返回</button>
+                <h2>🥇 排行榜</h2>
+            </div>
+            <div class="rankings-content">
+                <div class="ranking-tabs">
+                    <button class="tab-btn active" onclick="switchRankingTab('daily')">今日榜</button>
+                    <button class="tab-btn" onclick="switchRankingTab('weekly')">本周榜</button>
+                    <button class="tab-btn" onclick="switchRankingTab('total')">总榜</button>
+                </div>
+                <div class="ranking-list" id="rankingList">
+                    <!-- 排行榜动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 每日任务页 -->
+        <div id="dailyTasksPage" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goHome()">← 返回</button>
+                <h2>✅ 每日任务</h2>
+            </div>
+            <div class="daily-tasks-content">
+                <div class="task-header">
+                    <h3>今日任务</h3>
+                    <div class="task-reward">完成所有任务可获得 <span class="reward-exp">+100 EXP</span></div>
+                </div>
+                <div class="task-list" id="taskList">
+                    <!-- 任务列表动态生成 -->
+                </div>
+                <div class="task-summary">
+                    <div class="summary-item">
+                        <span>今日完成</span>
+                        <span><span id="completedTasks">0</span> / <span id="totalTasks">5</span></span>
+                    </div>
+                    <div class="summary-item">
+                        <span>获得经验</span>
+                        <span><span id="earnedExp">0</span> EXP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 用户档案页 -->
+        <div id="userProfilePage" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goHome()">← 返回</button>
+                <h2>👤 个人档案</h2>
+            </div>
+            <div class="profile-content">
+                <div class="profile-card">
+                    <div class="avatar-selector">
+                        <div class="current-avatar" id="currentAvatar">👦</div>
+                        <button class="btn-secondary" onclick="showAvatarSelector()">更换头像</button>
+                    </div>
+                    <div class="profile-info">
+                        <input type="text" id="userNameInput" class="form-control" placeholder="输入昵称" value="小朋友">
+                        <div class="level-info">
+                            <div class="level-badge">Lv.<span id="profileLevel">1</span></div>
+                            <div class="level-title" id="levelTitle">数学新手</div>
+                        </div>
+                        <div class="exp-info">
+                            <div class="exp-bar">
+                                <div class="exp-fill" style="width: 0%"></div>
+                            </div>
+                            <div class="exp-text"><span id="profileExp">0</span> / <span id="profileNextExp">100</span> EXP</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="profile-stats">
+                    <h3>学习成就</h3>
+                    <div class="stats-grid">
+                        <div class="stat">
+                            <div class="stat-value" id="profileTotalQuestions">0</div>
+                            <div class="stat-label">总答题数</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="profileCorrectRate">0%</div>
+                            <div class="stat-label">正确率</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="profileAchievements">0</div>
+                            <div class="stat-label">获得成就</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-value" id="profileStudyDays">0</div>
+                            <div class="stat-label">学习天数</div>
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-primary full-width" onclick="saveProfile()">保存修改</button>
+            </div>
+        </div>
+        
+        <!-- 数学小游戏中心页 -->
+        <div id="mathGamesPage" class="page">
+            <div class="page-header">
+                <button class="back-btn" onclick="goHome()">← 返回</button>
+                <h2>🎮 数学小游戏</h2>
+            </div>
+            <div class="games-content">
+                <div class="games-categories">
+                    <button class="category-btn active" onclick="filterGames('all')">全部</button>
+                    <button class="category-btn" onclick="filterGames('logic')">逻辑思维</button>
+                    <button class="category-btn" onclick="filterGames('speed')">速算挑战</button>
+                    <button class="category-btn" onclick="filterGames('puzzle')">益智解谜</button>
+                    <button class="category-btn" onclick="filterGames('memory')">记忆训练</button>
+                    <button class="category-btn" onclick="filterGames('visual')">空间想象</button>
+                </div>
+                <div class="games-grid" id="gamesGrid">
+                    <!-- 游戏卡片动态生成 -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- 游戏页面 -->
+        <div id="gamePage" class="page">
+            <div class="game-header">
+                <button class="back-btn" onclick="backToGameList()">← 返回</button>
+                <h2 id="gameTitle">游戏标题</h2>
+                <div class="game-score">得分: <span id="gameScore">0</span></div>
+            </div>
+            <div class="game-container" id="gameContainer">
+                <!-- 游戏内容动态加载 -->
+            </div>
+        </div>
+        
+        <!-- 结果页 -->
+        <div id="resultPage" class="page">
+            <div class="result-container">
+                <h2>🎉 练习完成！</h2>
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <div class="stat-label">正确题数</div>
+                        <div class="stat-value" id="correctCount">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">错误题数</div>
+                        <div class="stat-value" id="wrongCount">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">正确率</div>
+                        <div class="stat-value" id="accuracy">0%</div>
+                    </div>
+                </div>
+                
+                <div class="result-actions">
+                    <button onclick="restartPractice()" class="btn-primary">再练一次</button>
+                    <button onclick="goHome()" class="btn-secondary">返回首页</button>
+                </div>
+                
+                <div class="achievement" id="achievement">
+                    <!-- 成就展示 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 自定义弹窗容器 -->
+    <div id="modalContainer" class="modal-container">
+        <!-- 通用提示弹窗 -->
+        <div id="alertModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="alertTitle">提示</h3>
+                    <button class="modal-close" onclick="closeModal('alertModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p id="alertMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-primary" onclick="closeModal('alertModal')">确定</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 举报反馈弹窗 -->
+        <div id="reportModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>问题举报</h3>
+                    <button class="modal-close" onclick="closeModal('reportModal')">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>问题类型：</label>
+                        <select id="reportType" class="form-control">
+                            <option value="">请选择问题类型</option>
+                            <option value="bug">程序错误</option>
+                            <option value="content">内容问题</option>
+                            <option value="suggestion">功能建议</option>
+                            <option value="other">其他问题</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>反馈内容：</label>
+                        <textarea id="reportContent" class="form-control" rows="5" placeholder="请详细描述您的问题或建议..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>联系方式（选填）：</label>
+                        <input type="text" id="reportContact" class="form-control" placeholder="您的邮箱或电话">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-secondary" onclick="closeModal('reportModal')">取消</button>
+                    <button class="modal-btn modal-btn-primary" onclick="submitReport()">提交</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 成功提示弹窗 -->
+        <div id="successModal" class="modal">
+            <div class="modal-content modal-success">
+                <div class="modal-icon">✅</div>
+                <h3 id="successTitle">操作成功</h3>
+                <p id="successMessage">您的反馈已成功提交！</p>
+                <button class="modal-btn modal-btn-primary" onclick="closeModal('successModal')">好的</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/modal.js"></script>
+    <script src="js/questions.js"></script>
+    <script src="js/animations.js"></script>
+    <script src="js/features.js"></script>
+    <script src="js/games.js"></script>
+    <script src="js/games-logic.js"></script>
+    <script src="js/games-speed.js"></script>
+    <script src="js/games-puzzle.js"></script>
+    <script src="js/games-memory.js"></script>
+    <script src="js/games-visual.js"></script>
+    <script src="js/games-challenge.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

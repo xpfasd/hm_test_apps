@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>儿童财商训练</title>
+    <link rel="stylesheet" href="./libs/zcool-kuaile.css" />
+    <style>
+      html, body, #root {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: 'ZCOOL KuaiLe', cursive, system-ui, sans-serif;
+        background-color: #fef9c3; /* Yellow-50 */
+        overscroll-behavior: none;
+      }
+      .animate-bounce-short {
+        animation: bounce 0.5s infinite;
+      }
+      @keyframes bounce {
+        0%, 100% { transform: translateY(-5%); }
+        50% { transform: translateY(0); }
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.3s ease-out;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-shake {
+        animation: shake 0.5s ease-in-out;
+      }
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+      }
+    </style>
+    <script type="module" crossorigin src="./assets/index-DMcG6JeG.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-Bl_Kr2kc.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

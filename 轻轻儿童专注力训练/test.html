@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>自动化测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-item {
+            padding: 10px;
+            margin: 5px 0;
+            border-left: 3px solid #ccc;
+            background: #f9f9f9;
+        }
+        .test-item.pass {
+            border-left-color: #4caf50;
+            background: #e8f5e9;
+        }
+        .test-item.fail {
+            border-left-color: #f44336;
+            background: #ffebee;
+        }
+        .test-item.pending {
+            border-left-color: #ff9800;
+            background: #fff3e0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #2196f3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        #console-output {
+            background: #263238;
+            color: #aed581;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .log-entry {
+            margin: 2px 0;
+        }
+        .log-error {
+            color: #ef5350;
+        }
+        .log-warn {
+            color: #ffb74d;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 专注力训练项目 - 自动化测试</h1>
+    
+    <div class="test-section">
+        <h2>测试控制</h2>
+        <button onclick="runAllTests()">运行所有测试</button>
+        <button onclick="clearResults()">清除结果</button>
+        <button onclick="openMainPage()">打开主页面</button>
+        <button onclick="openGamePage()">打开项目页面</button>
+    </div>
+
+    <div class="test-section">
+        <h2>测试结果</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>控制台监控</h2>
+        <div id="console-output"></div>
+    </div>
+
+    <script>
+        let testResults = [];
+        let consoleLogs = [];
+
+        // 捕获控制台输出
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addConsoleLog('log', args.join(' '));
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addConsoleLog('error', args.join(' '));
+        };
+
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            addConsoleLog('warn', args.join(' '));
+        };
+
+        // 捕获全局错误
+        window.addEventListener('error', function(e) {
+            addConsoleLog('error', `JavaScript错误: ${e.message} at ${e.filename}:${e.lineno}`);
+        });
+
+        function addConsoleLog(type, message) {
+            consoleLogs.push({ type, message, time: new Date().toLocaleTimeString() });
+            updateConsoleDisplay();
+        }
+
+        function updateConsoleDisplay() {
+            const output = document.getElementById('console-output');
+            output.innerHTML = consoleLogs.slice(-50).map(log => 
+                `<div class="log-entry log-${log.type}">[${log.time}] ${log.message}</div>`
+            ).join('');
+            output.scrollTop = output.scrollHeight;
+        }
+
+        function addTestResult(name, status, message = '') {
+            testResults.push({ name, status, message });
+            updateTestDisplay();
+        }
+
+        function updateTestDisplay() {
+            const container = document.getElementById('test-results');
+            container.innerHTML = testResults.map(test => 
+                `<div class="test-item ${test.status}">
+                    <strong>${test.name}</strong>: ${test.status === 'pass' ? '✅ 通过' : test.status === 'fail' ? '❌ 失败' : '⏳ 待测试'}
+                    ${test.message ? `<br><small>${test.message}</small>` : ''}
+                </div>`
+            ).join('');
+        }
+
+        function clearResults() {
+            testResults = [];
+            consoleLogs = [];
+            updateTestDisplay();
+            updateConsoleDisplay();
+        }
+
+        function openMainPage() {
+            window.open('http://localhost:8000/index.html', '_blank');
+        }
+
+        function openGamePage() {
+            window.open('http://localhost:8000/game1-level1.html', '_blank');
+        }
+
+        async function runAllTests() {
+            clearResults();
+            addTestResult('开始测试', 'pending');
+            
+            // 测试1: 检查主页面是否可访问
+            try {
+                const response = await fetch('http://localhost:8000/index.html');
+                if (response.ok) {
+                    addTestResult('主页面可访问', 'pass');
+                } else {
+                    addTestResult('主页面可访问', 'fail', `HTTP ${response.status}`);
+                }
+            } catch (e) {
+                addTestResult('主页面可访问', 'fail', e.message);
+            }
+
+            // 测试2: 检查项目页面是否可访问
+            try {
+                const response = await fetch('http://localhost:8000/game1-level1.html');
+                if (response.ok) {
+                    addTestResult('项目页面可访问', 'pass');
+                } else {
+                    addTestResult('项目页面可访问', 'fail', `HTTP ${response.status}`);
+                }
+            } catch (e) {
+                addTestResult('项目页面可访问', 'fail', e.message);
+            }
+
+            // 测试3: 检查CSS文件
+            try {
+                const response = await fetch('http://localhost:8000/css/style.css');
+                if (response.ok) {
+                    addTestResult('CSS文件可访问', 'pass');
+                } else {
+                    addTestResult('CSS文件可访问', 'fail', `HTTP ${response.status}`);
+                }
+            } catch (e) {
+                addTestResult('CSS文件可访问', 'fail', e.message);
+            }
+
+            // 测试4: 检查JS文件
+            try {
+                const response = await fetch('http://localhost:8000/js/main.js');
+                if (response.ok) {
+                    addTestResult('JavaScript文件可访问', 'pass');
+                } else {
+                    addTestResult('JavaScript文件可访问', 'fail', `HTTP ${response.status}`);
+                }
+            } catch (e) {
+                addTestResult('JavaScript文件可访问', 'fail', e.message);
+            }
+
+            // 测试5: 检查localStorage支持
+            try {
+                localStorage.setItem('test', 'value');
+                const value = localStorage.getItem('test');
+                localStorage.removeItem('test');
+                if (value === 'value') {
+                    addTestResult('localStorage支持', 'pass');
+                } else {
+                    addTestResult('localStorage支持', 'fail', '存储值不匹配');
+                }
+            } catch (e) {
+                addTestResult('localStorage支持', 'fail', e.message);
+            }
+
+            // 测试6: 检查响应式断点
+            const breakpoints = [
+                { width: 360, name: '小屏手机' },
+                { width: 480, name: '大屏手机' },
+                { width: 768, name: '平板' },
+                { width: 1024, name: '桌面' }
+            ];
+
+            breakpoints.forEach(bp => {
+                const isMobile = bp.width <= 480;
+                addTestResult(`响应式断点: ${bp.name} (${bp.width}px)`, 'pending', 
+                    `建议: 在此宽度下手动测试布局`);
+            });
+
+            addTestResult('基础测试完成', 'pass', '请手动测试页面功能和响应式设计');
+        }
+
+        // 页面加载时运行初始检查
+        window.addEventListener('load', function() {
+            console.log('测试页面已加载');
+            console.log('当前窗口大小:', window.innerWidth, 'x', window.innerHeight);
+        });
+    </script>
+</body>
+</html>
+

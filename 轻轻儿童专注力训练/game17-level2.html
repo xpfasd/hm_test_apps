@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第2关 - 数字比大小</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body{background:linear-gradient(135deg,#e3f2fd 0%,#fff3e0 100%);}
+        .compare-area{max-width:360px;margin:22px auto;background:#fff;border-radius:18px;box-shadow:0 2px 16px #90caf980;padding:20px 10px;text-align:center;}
+        .numbers-row{display:flex;justify-content:center;align-items:center;gap:18px;margin:18px 0;}
+        .number-box{width:85px;height:85px;border-radius:15px;background:linear-gradient(135deg,#81c784,#66bb6a);color:#fff;font-size:44px;font-weight:bold;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 12px #a5d6a7;}
+        .choice-btns{display:flex;gap:13px;justify-content:center;margin-top:22px;}
+        .choice-btn{padding:11px 22px;border-radius:13px;border:none;font-size:19px;font-weight:bold;cursor:pointer;box-shadow:0 2px 8px #ddd;transition:.2s;}
+        .choice-btn:active{transform:scale(0.92);}
+        .btn-greater{background:#ffeb3b;color:#f57f17;}
+        .btn-less{background:#ff9800;color:#fff;}
+        .score-info{margin-top:13px;font-size:16px;color:#388e3c;font-weight:bold;}
+    </style>
+</head>
+<body class="game-page">
+<div class="container">
+    <div class="game-header">
+        <div class="back-btn" onclick="goHome()">⬅️</div>
+        <div class="game-info"><div class="level-title">数字比大小 • 第2关</div><div class="timer" id="timer">⏱️ 0秒</div></div>
+    </div>
+    <div class="game-area">
+        <div class="game-instruction">数字变大了！快速判断！</div>
+        <div class="compare-area">
+            <div class="numbers-row">
+                <div class="number-box" id="num1">12</div>
+                <div style="font-size:30px;color:#999;">vs</div>
+                <div class="number-box" id="num2">8</div>
+            </div>
+            <div class="choice-btns">
+                <button class="choice-btn btn-greater" onclick="choose('greater')">左边大 ></button>
+                <button class="choice-btn btn-less" onclick="choose('less')">左边小 <</button>
+            </div>
+            <div class="score-info" id="scoreInfo">答对：0/8</div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="resultModal">
+    <div class="modal-content"><h2 id="resultTitle"></h2>
+        <div class="star-rating" id="starRating">⭐⭐⭐</div>
+        <p id="resultMsg"></p>
+        <p id="timeUsed"></p>
+        <div><button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button><button class="btn btn-primary" onclick="nextLevel('game17',2)">➡️ 下一关</button></div>
+    </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+let correct=0,total=8,current=0,pairs=[],startTime,timerInt;
+function genPairs(){for(let i=0;i<total;i++){let a=Math.floor(Math.random()*20)+1,b=Math.floor(Math.random()*20)+1;while(a===b)b=Math.floor(Math.random()*20)+1;pairs.push({a,b});}}
+function showPair(){if(current>=total){showResult();return;}document.getElementById('num1').textContent=pairs[current].a;document.getElementById('num2').textContent=pairs[current].b;}
+function choose(type){let{a,b}=pairs[current];let isCorrect=(type==='greater'&&a>b)||(type==='less'&&a<b);if(isCorrect){correct++;playSound('correct');}else{playSound('wrong');}current++;document.getElementById('scoreInfo').textContent=`答对：${correct}/${total}`;setTimeout(showPair,400);}
+function showResult(){let used=Math.floor((Date.now()-startTime)/1000),stars=3;if(correct<5)stars=1;else if(correct<7)stars=2;updateLevelProgress('game17',2,stars);document.getElementById('starRating').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);document.getElementById('resultTitle').textContent=correct>=7?'🎉 太棒了！':'💪 加油';document.getElementById('resultMsg').textContent=`答对${correct}/${total}题`;document.getElementById('timeUsed').textContent=`用时: ${used}秒`;showModal('resultModal');playSound('win');}
+window.onload=function(){genPairs();showPair();startTime=Date.now();if(timerInt)clearInterval(timerInt);timerInt=setInterval(()=>{document.getElementById('timer').textContent=`⏱️ ${Math.floor((Date.now()-startTime)/1000)}秒`;},1000);}
+</script>
+</body>
+</html>
+

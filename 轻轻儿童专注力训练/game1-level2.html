@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第2关 - 找相同小动物</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="game-page">
+    <div class="container">
+        <div class="game-header">
+            <div class="back-btn" onclick="goHome()">⬅️</div>
+            <div class="game-info">
+                <div class="level-title">第 2 关</div>
+                <div class="timer" id="timer">⏱️ 0秒</div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div class="game-instruction">
+                找出<strong>2只</strong>和目标<br>相同的小动物！
+            </div>
+            
+            <div class="target-animal" id="targetAnimal">
+                🐱
+            </div>
+            
+            <div class="animals-grid" id="animalsGrid" style="grid-template-columns: repeat(3, 1fr);">
+                <!-- 动物卡片将由JavaScript生成 -->
+            </div>
+            
+            <div style="margin-top: 20px; font-size: 18px; color: #666;">
+                已找到: <span id="foundCount" style="color: #ff6b6b; font-weight: bold; font-size: 24px;">0</span> / 2
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <h2 id="resultTitle">🎉 太棒了!</h2>
+            <div class="star-rating" id="starRating">⭐⭐⭐</div>
+            <p id="resultMessage">你找到了所有相同的小动物！</p>
+            <p id="timeUsed">用时: 0秒</p>
+            <p id="resultTips" style="margin-top:15px;padding:10px;background:#fff3cd;border-radius:8px;font-size:14px;line-height:1.6;color:#856404;"></p>
+            <div>
+                <button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button>
+                <button class="btn btn-primary" onclick="nextLevel('game1', 2)">➡️ 下一关</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        const GAME_CONFIG = {
+            level: 2,
+            game: 'game1',
+            gridSize: 9,
+            targetAnimal: '🐱',
+            animals: ['🐱', '🐱', '🐶', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'],
+            targetCount: 2,
+        };
+
+        let startTime;
+        let timerInterval;
+        let foundCount = 0;
+        let gameCompleted = false;
+
+        function initGame() {
+            startTime = Date.now();
+            gameCompleted = false;
+            foundCount = 0;
+            
+            document.getElementById('targetAnimal').textContent = GAME_CONFIG.targetAnimal;
+            document.getElementById('targetAnimal').style.fontSize = '80px';
+            document.getElementById('targetAnimal').style.marginBottom = '30px';
+            
+            generateAnimals();
+            startTimer();
+            updateFoundCount();
+        }
+
+        function generateAnimals() {
+            const grid = document.getElementById('animalsGrid');
+            grid.innerHTML = '';
+            
+            const shuffled = [...GAME_CONFIG.animals].sort(() => Math.random() - 0.5);
+            
+            shuffled.forEach((animal, index) => {
+                const card = document.createElement('div');
+                card.className = 'animal-card';
+                card.textContent = animal;
+                card.onclick = () => selectAnimal(animal, card);
+                grid.appendChild(card);
+            });
+        }
+
+        function selectAnimal(animal, cardElement) {
+            if (gameCompleted || cardElement.classList.contains('correct')) return;
+            
+            cardElement.classList.add('selected');
+            
+            if (animal === GAME_CONFIG.targetAnimal) {
+                playSound('correct');
+                cardElement.classList.add('correct');
+                cardElement.onclick = null; // 禁用已选中的
+                foundCount++;
+                updateFoundCount();
+                
+                if (foundCount >= GAME_CONFIG.targetCount) {
+                    setTimeout(() => completeGame(true), 500);
+                } else {
+                    setTimeout(() => {
+                        cardElement.classList.remove('selected');
+                    }, 300);
+                }
+            } else {
+                playSound('wrong');
+                cardElement.classList.add('wrong');
+                setTimeout(() => {
+                    cardElement.classList.remove('selected', 'wrong');
+                }, 1000);
+            }
+        }
+
+        function updateFoundCount() {
+            document.getElementById('foundCount').textContent = foundCount;
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                document.getElementById('timer').textContent = `⏱️ ${elapsed}秒`;
+            }, 1000);
+        }
+
+        function completeGame(success) {
+            if (gameCompleted) return;
+            gameCompleted = true;
+            
+            clearInterval(timerInterval);
+            const timeUsed = Math.floor((Date.now() - startTime) / 1000);
+            
+            let stars = 3;
+            if (timeUsed > 25) stars = 1;
+            else if (timeUsed > 15) stars = 2;
+            
+            updateLevelProgress(GAME_CONFIG.game, GAME_CONFIG.level, stars);
+            
+            playSound('win');
+            document.getElementById('starRating').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+            document.getElementById('timeUsed').textContent = `用时: ${timeUsed}秒`;
+            
+            setTimeout(() => {
+                showModal('resultModal');
+            }, 800);
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>
+

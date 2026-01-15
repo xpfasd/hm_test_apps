@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>挑战模式测试</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/features.css">
+    <style>
+        body {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .test-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .test-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .test-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .test-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        
+        .test-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .test-btn {
+            padding: 20px;
+            font-size: 1.1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .test-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .test-btn .icon {
+            font-size: 2rem;
+        }
+        
+        .console-output {
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        
+        .console-log {
+            margin: 2px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-header">
+            <h1>🎯 挑战模式功能测试</h1>
+            <p>测试挑战模式的各项功能是否正常工作</p>
+        </div>
+        
+        <div class="test-info">
+            <p><strong>测试说明：</strong></p>
+            <p>1. 点击下方按钮启动不同的挑战模式</p>
+            <p>2. 测试计时器、答题、得分、记录保存等功能</p>
+            <p>3. 查看控制台输出了解功能状态</p>
+            <p>4. 测试完成后可以查看最佳记录是否正确保存</p>
+        </div>
+        
+        <div class="test-buttons">
+            <button class="test-btn" onclick="testOneMinuteChallenge()">
+                <span class="icon">⏱️</span>
+                <span>测试一分钟挑战</span>
+                <small>60秒限时答题</small>
+            </button>
+            
+            <button class="test-btn" onclick="testThreeMinuteChallenge()">
+                <span class="icon">⏰</span>
+                <span>测试三分钟挑战</span>
+                <small>180秒限时答题</small>
+            </button>
+            
+            <button class="test-btn" onclick="testSurvivalMode()">
+                <span class="icon">💪</span>
+                <span>测试生存模式</span>
+                <small>答错即结束</small>
+            </button>
+            
+            <button class="test-btn" onclick="testRecords()">
+                <span class="icon">📊</span>
+                <span>查看最佳记录</span>
+                <small>显示所有模式记录</small>
+            </button>
+            
+            <button class="test-btn" onclick="clearRecords()">
+                <span class="icon">🗑️</span>
+                <span>清除记录</span>
+                <small>重置所有最佳记录</small>
+            </button>
+            
+            <button class="test-btn" onclick="testAchievements()">
+                <span class="icon">🏆</span>
+                <span>测试成就系统</span>
+                <small>检查成就解锁</small>
+            </button>
+        </div>
+        
+        <!-- 挑战模式页容器 -->
+        <div id="challengePage" class="page" style="display:none;"></div>
+        
+        <div class="console-output" id="console">
+            <div class="console-log">控制台输出：</div>
+            <div class="console-log">准备就绪，等待测试...</div>
+        </div>
+    </div>
+    
+    <!-- 引入JS文件 -->
+    <script src="js/features.js"></script>
+    
+    <script>
+        // 日志输出函数
+        function log(message) {
+            const consoleEl = document.getElementById('console');
+            const logEl = document.createElement('div');
+            logEl.className = 'console-log';
+            logEl.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            consoleEl.appendChild(logEl);
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+        
+        // 测试一分钟挑战
+        function testOneMinuteChallenge() {
+            log('启动一分钟挑战模式...');
+            try {
+                startTimeChallenge(60);
+                log('✅ 一分钟挑战模式启动成功');
+                log('当前模式：' + challengeManager.mode);
+                log('挑战时长：' + challengeManager.duration + '秒');
+            } catch (error) {
+                log('❌ 错误：' + error.message);
+            }
+        }
+        
+        // 测试三分钟挑战
+        function testThreeMinuteChallenge() {
+            log('启动三分钟挑战模式...');
+            try {
+                startTimeChallenge(180);
+                log('✅ 三分钟挑战模式启动成功');
+                log('当前模式：' + challengeManager.mode);
+                log('挑战时长：' + challengeManager.duration + '秒');
+            } catch (error) {
+                log('❌ 错误：' + error.message);
+            }
+        }
+        
+        // 测试生存模式
+        function testSurvivalMode() {
+            log('启动生存模式...');
+            try {
+                startSurvivalChallenge();
+                log('✅ 生存模式启动成功');
+                log('当前模式：' + challengeManager.mode);
+                log('答错即结束');
+            } catch (error) {
+                log('❌ 错误：' + error.message);
+            }
+        }
+        
+        // 查看最佳记录
+        function testRecords() {
+            log('查看最佳记录...');
+            const best60 = localStorage.getItem('best60') || '0';
+            const best180 = localStorage.getItem('best180') || '0';
+            const bestSurvival = localStorage.getItem('bestSurvival') || '0';
+            
+            log('一分钟挑战最佳记录：' + best60 + ' 题');
+            log('三分钟挑战最佳记录：' + best180 + ' 题');
+            log('生存模式最佳记录：' + bestSurvival + ' 题');
+        }
+        
+        // 清除记录
+        function clearRecords() {
+            if (confirm('确定要清除所有最佳记录吗？')) {
+                localStorage.removeItem('best60');
+                localStorage.removeItem('best180');
+                localStorage.removeItem('bestSurvival');
+                log('✅ 所有记录已清除');
+                testRecords();
+            }
+        }
+        
+        // 测试成就系统
+        function testAchievements() {
+            log('测试成就系统...');
+            if (typeof featureManager === 'undefined') {
+                log('❌ featureManager 未定义');
+                log('创建 featureManager 实例...');
+                window.featureManager = new FeatureManager();
+            }
+            
+            const achievements = featureManager.achievements;
+            log('成就总数：' + achievements.length);
+            
+            const unlockedCount = achievements.filter(a => a.unlocked).length;
+            log('已解锁成就：' + unlockedCount);
+            log('未解锁成就：' + (achievements.length - unlockedCount));
+            
+            // 查找挑战相关成就
+            const challengerAch = achievements.find(a => a.id === 'challenger');
+            const survivorAch = achievements.find(a => a.id === 'survivor');
+            
+            if (challengerAch) {
+                log('挑战者成就状态：' + (challengerAch.unlocked ? '已解锁' : '未解锁'));
+            }
+            if (survivorAch) {
+                log('生存专家成就状态：' + (survivorAch.unlocked ? '已解锁' : '未解锁'));
+            }
+        }
+        
+        // 返回首页函数（供挑战模式使用）
+        function goHome() {
+            log('返回测试页面');
+            document.getElementById('challengePage').style.display = 'none';
+            document.querySelector('.test-container').style.display = 'block';
+        }
+        
+        // 创建 FeatureManager 实例
+        window.featureManager = new FeatureManager();
+        log('✅ FeatureManager 已初始化');
+        
+        // 初始化页面
+        log('✅ 测试页面加载完成');
+    </script>
+</body>
+</html>

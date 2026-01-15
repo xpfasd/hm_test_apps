@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>返回首页Bug修复测试</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/features.css">
+    <style>
+        body {
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .test-info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .test-info h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .test-steps {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .test-steps li {
+            margin: 8px 0;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        
+        .status-ok {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .status-error {
+            background: #f44336;
+            color: white;
+        }
+        
+        .debug-info {
+            background: #1e1e1e;
+            color: #0f0;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <!-- 测试说明 -->
+    <div class="test-info">
+        <h2>🔧 返回首页Bug修复测试</h2>
+        <p><strong>问题描述：</strong>挑战模式结束后，点击【返回首页】按钮无响应</p>
+        <p><strong>修复方案：</strong></p>
+        <ul>
+            <li>✅ 修改了 showPage() 方法，重置所有页面的 display 属性</li>
+            <li>✅ 特别处理挑战页面的隐藏逻辑</li>
+            <li>✅ 确保页面切换时同步 active 类和 display 属性</li>
+        </ul>
+        
+        <div class="test-steps">
+            <h3>测试步骤：</h3>
+            <ol>
+                <li>点击下方的【一分钟挑战】按钮启动挑战</li>
+                <li>在挑战页面点击【← 退出】按钮结束挑战</li>
+                <li>在结果页面点击【返回首页】按钮</li>
+                <li>验证是否成功返回到主页面</li>
+            </ol>
+        </div>
+        
+        <p id="status">当前状态：<span class="status-indicator status-ok">准备就绪</span></p>
+    </div>
+    
+    <!-- 模拟主页 -->
+    <div id="homePage" class="page active">
+        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center;">
+            <h1>📚 数学练习主页</h1>
+            <p>这是模拟的主页面</p>
+            <div style="margin: 30px 0;">
+                <button onclick="testChallenge()" style="padding: 15px 30px; font-size: 18px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 10px; cursor: pointer;">
+                    ⏱️ 一分钟挑战
+                </button>
+            </div>
+            <p style="color: #666;">点击上方按钮开始测试</p>
+        </div>
+    </div>
+    
+    <!-- 挑战页面容器 -->
+    <div id="challengePage" class="page" style="display: none;"></div>
+    
+    <!-- 其他测试页面 -->
+    <div id="categoryPage" class="page" style="display: none;">
+        <div style="background: white; padding: 20px; border-radius: 10px;">
+            <h2>类别选择页面（测试用）</h2>
+        </div>
+    </div>
+    
+    <div id="practicePage" class="page" style="display: none;">
+        <div style="background: white; padding: 20px; border-radius: 10px;">
+            <h2>练习页面（测试用）</h2>
+        </div>
+    </div>
+    
+    <!-- 调试信息 -->
+    <div class="debug-info" id="debugInfo">
+        <div>调试信息：</div>
+    </div>
+    
+    <!-- 引入JS文件 -->
+    <script src="js/app.js"></script>
+    <script src="js/features.js"></script>
+    
+    <script>
+        // 初始化app实例
+        const app = new MathPracticeApp();
+        
+        // 初始化feature管理器
+        const featureManager = new FeatureManager();
+        
+        // 日志函数
+        function log(msg) {
+            const debugDiv = document.getElementById('debugInfo');
+            const time = new Date().toLocaleTimeString();
+            debugDiv.innerHTML += `<div>[${time}] ${msg}</div>`;
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+        }
+        
+        // 测试挑战模式
+        function testChallenge() {
+            log('启动一分钟挑战模式...');
+            updateStatus('正在挑战中', 'status-ok');
+            
+            try {
+                startTimeChallenge(60);
+                log('✅ 挑战模式启动成功');
+                
+                // 监听页面变化
+                setTimeout(() => {
+                    checkPageStatus();
+                }, 100);
+            } catch (error) {
+                log('❌ 错误：' + error.message);
+                updateStatus('启动失败', 'status-error');
+            }
+        }
+        
+        // 重写goHome函数，添加日志
+        const originalGoHome = window.goHome;
+        window.goHome = function() {
+            log('调用 goHome() 函数...');
+            updateStatus('正在返回首页...', 'status-ok');
+            
+            // 调用原始函数
+            if (originalGoHome) {
+                originalGoHome();
+            }
+            
+            // 检查结果
+            setTimeout(() => {
+                const homePage = document.getElementById('homePage');
+                const challengePage = document.getElementById('challengePage');
+                
+                const homeVisible = homePage && (homePage.style.display !== 'none') && homePage.classList.contains('active');
+                const challengeHidden = challengePage && (challengePage.style.display === 'none');
+                
+                log(`首页可见: ${homeVisible}`);
+                log(`挑战页隐藏: ${challengeHidden}`);
+                
+                if (homeVisible && challengeHidden) {
+                    log('✅ 成功返回首页！');
+                    updateStatus('已返回首页', 'status-ok');
+                } else {
+                    log('❌ 返回首页失败');
+                    updateStatus('返回失败', 'status-error');
+                    
+                    // 显示详细状态
+                    log(`homePage.display: ${homePage ? homePage.style.display : 'null'}`);
+                    log(`homePage.active: ${homePage ? homePage.classList.contains('active') : 'null'}`);
+                    log(`challengePage.display: ${challengePage ? challengePage.style.display : 'null'}`);
+                }
+            }, 100);
+        };
+        
+        // 更新状态显示
+        function updateStatus(text, className) {
+            const statusSpan = document.querySelector('#status .status-indicator');
+            statusSpan.textContent = text;
+            statusSpan.className = 'status-indicator ' + className;
+        }
+        
+        // 检查页面状态
+        function checkPageStatus() {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                const visible = page.style.display !== 'none';
+                const active = page.classList.contains('active');
+                if (visible || active) {
+                    log(`页面 ${page.id}: display=${page.style.display || 'default'}, active=${active}`);
+                }
+            });
+        }
+        
+        // 页面加载完成
+        log('测试页面加载完成');
+        log('点击【一分钟挑战】按钮开始测试');
+        
+        // 初始检查
+        checkPageStatus();
+    </script>
+</body>
+</html>

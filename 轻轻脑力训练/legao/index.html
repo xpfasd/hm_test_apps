@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>积木大师 - 积木模拟器</title>
+    <script type="module" crossorigin src="./assets/index-DUb0qKuf.js"></script>
+    <link rel="stylesheet" crossorigin href="./assets/index-CQO0HQ1r.css">
+    <style>
+      .back-button {
+        position: fixed;
+        top: 68px;
+        right: 12px;
+        z-index: 9999;
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #3b82f6, #2563eb);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        transition: all 0.2s ease;
+      }
+      .back-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.5);
+      }
+      .back-button:active {
+        transform: scale(0.95);
+      }
+      .back-button svg {
+        width: 24px;
+        height: 24px;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="back-button" onclick="history.back()" title="返回上一级">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+    </button>
+    <div id="root"></div>
+  </body>
+</html>

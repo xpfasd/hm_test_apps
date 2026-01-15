@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第5关 - 顺序点击</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body{background:linear-gradient(135deg,#fce4ec 0%,#f3e5f5 100%);}
+        .sequence-area{max-width:450px;margin:12px auto;background:#fff;border-radius:18px;box-shadow:0 2px 16px #f48fb180;padding:12px 2px;}
+        .grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin:10px 0;}
+        .cell{width:100%;aspect-ratio:1;border-radius:6px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:.2s;box-shadow:0 2px 8px #ddd;}
+        .cell:active{transform:scale(0.86);}
+        .cell.correct{background:#c8e6c9;animation:popIn .4s;}
+        .cell.wrong{background:#ffccbc;animation:shake .5s;}
+        .tip{text-align:center;margin:4px 0;font-size:12px;color:#666;font-weight:bold;}
+    </style>
+</head>
+<body class="game-page">
+<div class="container">
+    <div class="game-header">
+        <div class="back-btn" onclick="goHome()">⬅️</div>
+        <div class="game-info"><div class="level-title">顺序点击 • 第5关 👑</div><div class="timer" id="timer">⏱️ 0秒</div></div>
+    </div>
+    <div class="game-area">
+        <div class="game-instruction">🏆 终极挑战！25个数字极限专注！</div>
+        <div class="sequence-area">
+            <div class="tip" id="tip">点击最小的数字开始！</div>
+            <div class="grid" id="grid"></div>
+        </div>
+    </div>
+</div>
+<div class="modal" id="resultModal">
+    <div class="modal-content"><h2 id="resultTitle"></h2>
+        <div class="star-rating" id="starRating">⭐⭐⭐</div>
+        <p id="resultMsg"></p>
+        <p id="timeUsed"></p>
+        <div><button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button><button class="btn btn-primary" onclick="goHome()">🏠 返回主页</button></div>
+    </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+const nums=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25];
+let expected=1,startTime,timerInt;
+function shuffle(arr){return arr.sort(()=>Math.random()-.5)}
+function renderGrid(){let grid=document.getElementById('grid');grid.innerHTML='';shuffle(nums).forEach(n=>{let div=document.createElement('div');div.className='cell';div.textContent=n;div.onclick=()=>clickCell(n,div);grid.appendChild(div);});}
+function clickCell(n,dom){if(n===expected){dom.classList.add('correct');playSound('correct');expected++;document.getElementById('tip').textContent=`下一个: ${expected}`;if(expected>25){setTimeout(()=>{let used=Math.floor((Date.now()-startTime)/1000),stars=3;if(used>42)stars=1;else if(used>32)stars=2;updateLevelProgress('game18',5,stars);document.getElementById('starRating').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);document.getElementById('resultTitle').textContent='🏅 专注力大师！';document.getElementById('resultMsg').textContent='25个数字全部正确，你太强了！';document.getElementById('timeUsed').textContent=`用时: ${used}秒`;showModal('resultModal');playSound('win');},600);}}else{dom.classList.add('wrong');playSound('wrong');setTimeout(()=>dom.classList.remove('wrong'),500);}}
+window.onload=function(){renderGrid();startTime=Date.now();if(timerInt)clearInterval(timerInt);timerInt=setInterval(()=>{document.getElementById('timer').textContent=`⏱️ ${Math.floor((Date.now()-startTime)/1000)}秒`;},1000);}
+</script>
+</body>
+</html>
+

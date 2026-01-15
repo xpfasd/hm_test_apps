@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>专注力训练 - 儿童益智项目</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/home-animations.css">
+    <script>
+        // 配置：是否显示“测试模式”入口（true 显示，false 隐藏）
+        window.APP_CONFIG = window.APP_CONFIG || {};
+        window.APP_CONFIG.showTestMode = false; // 改为 false 可隐藏测试模式
+    </script>
+</head>
+<body class="home-page">
+    <div class="container">
+        <!-- 头部标题 -->
+        <header class="header">
+            <h1 class="title animate-title">🎯 专注力训练</h1>
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                <label id="testModeWrapper" style="display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer;">
+                    <input type="checkbox" id="testMode" style="width: 20px; height: 20px; cursor: pointer;">
+                    <span>测试模式</span>
+                </label>
+                <div class="stars-container animate-pulse">
+                    <span class="star">⭐</span>
+                    <span class="star-count" id="totalStars">0</span>
+                </div>
+                <button class="btn btn-primary" id="achievementBtn" style="font-size:14px;padding:8px 16px;">🏆 成就</button>
+                <button class="btn btn-info" id="parentReportBtn" style="font-size:14px;padding:8px 16px;">📊 报告</button>
+                <button class="btn btn-secondary" id="reportBtn" style="font-size:14px;padding:8px 16px;">举报</button>
+                <button class="btn btn-warning" id="privacyBtn" style="font-size:14px;padding:8px 16px;">🔒 儿童隐私</button>
+            </div>
+        </header>
+
+        <!-- 关卡地图 -->
+        <div class="level-map">
+            <div class="game-section">
+                <h2 class="game-title">🦁 找相同小动物</h2>
+                <p class="game-desc">找出相同的小动物!</p>
+                <div class="levels-grid" id="game1Levels"></div>
+            </div>
+            <div class="game-section" id="game2Section">
+                <h2 class="game-title">🐘 记忆翻牌</h2>
+                <p class="game-desc">记住小动物的位置!</p>
+                <div class="levels-grid" id="game2Levels"></div>
+            </div>
+            <div class="game-section" id="game3Section">
+                <h2 class="game-title">🐯 颜色配对</h2>
+                <p class="game-desc">找出相同颜色的动物!</p>
+                <div class="levels-grid" id="game3Levels"></div>
+            </div>
+            <div class="game-section" id="game4Section">
+                <h2 class="game-title">🦊 数数项目</h2>
+                <p class="game-desc">数一数有几只小动物!</p>
+                <div class="levels-grid" id="game4Levels"></div>
+            </div>
+            <div class="game-section" id="game5Section">
+                <h2 class="game-title">🔺 形状找一找</h2>
+                <p class="game-desc">找出指定形状和颜色!</p>
+                <div class="levels-grid" id="game5Levels"></div>
+            </div>
+            <div class="game-section" id="game6Section">
+                <h2 class="game-title">🔗 连连看</h2>
+                <p class="game-desc">配对相同的小动物!</p>
+                <div class="levels-grid" id="game6Levels"></div>
+            </div>
+            <div class="game-section" id="game7Section">
+                <h2 class="game-title">📏 排序小动物</h2>
+                <p class="game-desc">按顺序排列小动物!</p>
+                <div class="levels-grid" id="game7Levels"></div>
+            </div>
+            <div class="game-section" id="game8Section">
+                <h2 class="game-title">🌀 路径迷宫</h2>
+                <p class="game-desc">帮小动物找到出路!</p>
+                <div class="levels-grid" id="game8Levels"></div>
+            </div>
+            <div class="game-section" id="game9Section">
+                <h2 class="game-title">🎨 记忆图案</h2>
+                <p class="game-desc">记住并还原图案!</p>
+                <div class="levels-grid" id="game9Levels"></div>
+            </div>
+            <div class="game-section" id="game10Section">
+                <h2 class="game-title">⚡ 反应点击</h2>
+                <p class="game-desc">快速点击反应灯!</p>
+                <div class="levels-grid" id="game10Levels"></div>
+            </div>
+            <div class="game-section" id="game11Section">
+                <h2 class="game-title">🗺️ 空间匹配</h2>
+                <p class="game-desc">选择正确空间位置!</p>
+                <div class="levels-grid" id="game11Levels"></div>
+            </div>
+            <div class="game-section" id="game12Section">
+                <h2 class="game-title">🎈 指定颜色填色</h2>
+                <p class="game-desc">按指定填涂颜色!</p>
+                <div class="levels-grid" id="game12Levels"></div>
+            </div>
+            <div class="game-section" id="game13Section">
+                <h2 class="game-title">🦆 找不同</h2>
+                <p class="game-desc">找出与众不同的一只!</p>
+                <div class="levels-grid" id="game13Levels"></div>
+            </div>
+            <div class="game-section" id="game14Section">
+                <h2 class="game-title">🥁 节奏模仿</h2>
+                <p class="game-desc">跟着节奏模仿敲击!</p>
+                <div class="levels-grid" id="game14Levels"></div>
+            </div>
+            <div class="game-section" id="game15Section">
+                <h2 class="game-title">⚡ 快速反应</h2>
+                <p class="game-desc">快速点击亮起的按钮!</p>
+                <div class="levels-grid" id="game15Levels"></div>
+            </div>
+            <div class="game-section" id="game16Section">
+                <h2 class="game-title">📦 拖拽归类</h2>
+                <p class="game-desc">拖动物品到正确分类!</p>
+                <div class="levels-grid" id="game16Levels"></div>
+            </div>
+            <div class="game-section" id="game17Section">
+                <h2 class="game-title">🔢 数字比大小</h2>
+                <p class="game-desc">快速比较数字大小!</p>
+                <div class="levels-grid" id="game17Levels"></div>
+            </div>
+            <div class="game-section" id="game18Section">
+                <h2 class="game-title">1️⃣ 顺序点击</h2>
+                <p class="game-desc">按照顺序点击数字!</p>
+                <div class="levels-grid" id="game18Levels"></div>
+            </div>
+            <div class="game-section" id="game19Section">
+                <h2 class="game-title">🔷 图形配对</h2>
+                <p class="game-desc">找出相同的图形!</p>
+                <div class="levels-grid" id="game19Levels"></div>
+            </div>
+            <div class="game-section" id="game20Section">
+                <h2 class="game-title">⏱️ 时间挑战</h2>
+                <p class="game-desc">在限定时间内完成挑战!</p>
+                <div class="levels-grid" id="game20Levels"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成就弹窗 -->
+    <div class="modal" id="achievementModal">
+        <div class="modal-content achievement">
+            <h2>🎉 太棒了!</h2>
+            <p class="achievement-text"></p>
+            <button class="btn btn-primary" onclick="closeModal()">继续</button>
+        </div>
+    </div>
+
+    <!-- tips专注力弹窗 -->
+    <div class="modal" id="tipsModal">
+      <div class="modal-content">
+        <h2>🧠 专注力小贴士</h2>
+        <p class="tips-text" style="font-size:18px;text-align:center;"></p>
+        <button class="btn btn-primary" onclick="closeModal()">知道啦</button>
+      </div>
+    </div>
+
+    <!-- 成就弹窗 -->
+    <div class="modal" id="achievementModal">
+      <div class="modal-content" style="max-width:500px;">
+        <h2>🏆 我的成就</h2>
+        <div id="achievementList" style="max-height:400px;overflow-y:auto;margin:20px 0;"></div>
+        <button class="btn btn-primary" onclick="closeModal()">关闭</button>
+      </div>
+    </div>
+
+    <!-- 家长报告弹窗 -->
+    <div class="modal" id="reportModal">
+      <div class="modal-content" style="max-width:600px;">
+        <h2>📊 学习报告</h2>
+        <div id="reportContent" style="max-height:500px;overflow-y:auto;margin:20px 0;"></div>
+        <button class="btn btn-primary" onclick="closeModal()">关闭</button>
+      </div>
+    </div>
+
+    <!-- 举报表单弹窗 -->
+    <div class="modal" id="reportFormModal">
+        <div class="modal-content" style="max-width:500px;">
+            <h2>📝 问题举报</h2>
+            <div style="margin:20px 0;">
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;margin-bottom:5px;color:#666;font-weight:bold;">举报类型：</label>
+                    <select id="reportType" style="width:100%;padding:10px;border:2px solid #ddd;border-radius:10px;font-size:16px;">
+                        <option value="">请选择举报类型</option>
+                        <option value="bug">程序错误/BUG</option>
+                        <option value="content">内容问题</option>
+                        <option value="difficulty">难度不合理</option>
+                        <option value="suggestion">功能建议</option>
+                        <option value="other">其他问题</option>
+                    </select>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;margin-bottom:5px;color:#666;font-weight:bold;">问题描述：</label>
+                    <textarea id="reportDescription" placeholder="请详细描述您遇到的问题..." style="width:100%;min-height:120px;padding:10px;border:2px solid #ddd;border-radius:10px;font-size:16px;resize:vertical;font-family:inherit;"></textarea>
+                </div>
+                <div style="margin-bottom:15px;">
+                    <label style="display:block;margin-bottom:5px;color:#666;font-weight:bold;">联系方式（可选）：</label>
+                    <input type="text" id="reportContactInfo" placeholder="邮箱或手机号" style="width:100%;padding:10px;border:2px solid #ddd;border-radius:10px;font-size:16px;">
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;">
+                <button class="btn btn-secondary" onclick="closeModal()" style="flex:1;">取消</button>
+                <button class="btn btn-primary" onclick="submitReport()" style="flex:1;">提交</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 举报成功弹窗 -->
+    <div class="modal" id="reportSuccessModal">
+        <div class="modal-content">
+            <h2>✅ 提交成功</h2>
+            <p>您的举报信息已提交，感谢反馈！<br>我们会尽快处理您的问题。</p>
+            <button class="btn btn-primary" onclick="closeModal()">确定</button>
+        </div>
+    </div>
+
+    <!-- 错误提示弹窗 -->
+    <div class="modal" id="errorModal">
+        <div class="modal-content" style="max-width:400px;">
+            <h2>⚠️ 提示</h2>
+            <p id="errorMessage" style="font-size:16px;color:#666;margin:20px 0;"></p>
+            <button class="btn btn-primary" onclick="closeModal()">知道了</button>
+        </div>
+    </div>
+
+    <!-- 儿童隐私政策模态框 -->
+    <div class="modal" id="privacyModal">
+        <div class="modal-content" style="max-width:600px;max-height:80vh;overflow-y:auto;">
+            <h2>🔒 儿童隐私保护政策</h2>
+            <div style="text-align:left;margin:20px 0;line-height:1.8;font-size:15px;color:#333;">
+                <p style="font-weight:bold;margin-bottom:15px;color:#2c3e50;">根据国家互联网信息办公室发布的《儿童个人信息网络保护规定》以及相关法律法规，我们制定了本专项政策。</p>
+
+                <h3 style="color:#3498db;margin-top:25px;margin-bottom:15px;">一、我们的核心承诺：不收集任何儿童个人信息</h3>
+                <p style="font-weight:bold;margin-bottom:10px;">我们郑重向您和您的孩子承诺：</p>
+                <p style="margin-bottom:15px;">本应用是一款专为儿童设计的、健康、绿色的应用。在正常使用过程中，我们不会主动收集、存储、使用或共享任何能够单独或结合其他信息识别儿童身份的个人信息。</p>
+
+                <p style="font-weight:bold;margin-bottom:10px;">这包括但不限于：</p>
+                <ul style="margin-left:20px;margin-bottom:15px;">
+                    <li><strong>身份信息：</strong>姓名、出生日期、身份证号码等。</li>
+                    <li><strong>联系信息：</strong>电话号码、电子邮箱地址、家庭住址等。</li>
+                    <li><strong>位置信息：</strong>我们不会通过GPS、Wi-Fi或IP地址等方式收集孩子的精确或粗略地理位置信息。</li>
+                    <li><strong>设备信息：</strong>我们不会收集设备的唯一标识符（如IMEI、MAC地址、Android ID、OAID等）、设备型号、操作系统版本等信息。</li>
+                    <li><strong>任何其他个人敏感信息。</strong></li>
+                </ul>
+
+                <h3 style="color:#3498db;margin-top:25px;margin-bottom:15px;">二、我们如何处理必要的应用运行</h3>
+                <p style="margin-bottom:15px;">为了确保应用的正常运行和基础功能的使用，我们可能会涉及以下非个人信息或仅在设备本地处理的信息：</p>
+
+                <div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:15px;">
+                    <p style="font-weight:bold;margin-bottom:8px;">1. 项目进度与设置：</p>
+                    <p style="margin-bottom:10px;">所有的项目进度、成就、设置（如音效开关）等数据都仅存储在您设备的本地。这些信息不会被上传到我们的服务器，也不会与任何第三方共享。当您卸载应用或清除应用数据时，这些信息将被永久删除。</p>
+                </div>
+
+                <div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:15px;">
+                    <p style="font-weight:bold;margin-bottom:8px;">2. 匿名化的崩溃信息（可选说明）：</p>
+                    <p style="margin-bottom:10px;">为了提升应用稳定性，改善用户体验，我们可能集成了第三方服务（如华为AGC的崩溃服务）。该服务仅会收集与应用崩溃相关的匿名化、非个人信息（如崩溃时间、设备操作系统版本），这些信息无法用于识别任何特定用户的身份。您可以在设备的系统设置中关闭此类数据的共享。</p>
+                </div>
+
+                <h3 style="color:#3498db;margin-top:25px;margin-bottom:15px;">三、关于第三方服务与链接</h3>
+                <p style="margin-bottom:15px;">本应用不含任何第三方广告，也没有任何指向外部网站的链接。我们确保您的孩子在一个封闭、安全的环境中享受应用内容，避免因跳转至外部资源而导致的信息泄露风险。</p>
+
+                <h3 style="color:#3498db;margin-top:25px;margin-bottom:15px;">四、家长的权利</h3>
+                <p style="font-weight:bold;margin-bottom:10px;">作为孩子的家长或监护人，您享有以下权利：</p>
+                <ul style="margin-left:20px;margin-bottom:15px;">
+                    <li><strong>知情权：</strong>您有权通过阅读本政策，了解我们对待儿童隐私的核心原则。</li>
+                    <li><strong>同意权：</strong>在您允许孩子下载和使用本应用前，我们默认您已阅读、理解并同意了本政策的全部内容。</li>
+                    <li><strong>删除权：</strong>如果您认为我们可能以任何方式处理了您孩子的个人信息（尽管我们承诺不会），或者您希望终止孩子使用本应用，您可以通过【卸载应用】的方式，永久删除所有存储在设备本地的数据。如需进一步联系我们，请通过下文提供的联系方式。</li>
+                </ul>
+
+                <div style="background:#e8f4fd;padding:15px;border-radius:8px;margin-top:20px;border-left:4px solid #3498db;">
+                    <p style="font-weight:bold;margin-bottom:8px;color:#2980b9;">🛡️ 我们的承诺</p>
+                    <p style="margin-bottom:0;color:#34495e;">我们将严格遵守相关法律法规，持续完善隐私保护措施，为儿童创造一个安全、健康、绿色的网络环境。</p>
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px;">
+                <button class="btn btn-primary" onclick="closeModal()" style="flex:1;">我已了解</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script>
+        // 测试模式切换
+        document.getElementById('testMode').addEventListener('change', function(e) {
+            const testMode = e.target.checked;
+            localStorage.setItem('testMode', testMode);
+            initLevels();
+        });
+        
+        // 初始化关卡
+        function initLevels() {
+            // 根据配置显示/隐藏测试模式入口
+            const wrapper = document.getElementById('testModeWrapper');
+            const showTest = !!(window.APP_CONFIG && window.APP_CONFIG.showTestMode);
+            if (wrapper) {
+                wrapper.style.display = showTest ? '' : 'none';
+                if (!showTest) {
+                    localStorage.setItem('testMode', 'false');
+                }
+            }
+            const progress = getProgress();
+            const testMode = localStorage.getItem('testMode') === 'true';
+            document.getElementById('testMode').checked = testMode;
+            // 清空所有关卡容器，避免重复渲染
+            for (let i = 1; i <= 20; i++) {
+                const container = document.getElementById(`game${i}Levels`);
+                if (container) container.innerHTML = '';
+                const section = document.getElementById(`game${i}Section`);
+                if (section) {
+                    const overlay = section.querySelector('.locked-overlay');
+                    if (overlay) overlay.remove();
+                }
+            }
+            // 初始化所有游戏的关卡（默认全部解锁）
+            for (let i = 1; i <= 20; i++) {
+                initGameLevels(`game${i}`, i, 5);
+            }
+            updateTotalStars();
+        }
+
+        // 添加锁定遮罩层辅助函数
+        function addLockedOverlay(section) {
+            const overlay = document.createElement('div');
+            overlay.className = 'locked-overlay';
+            overlay.innerHTML = `
+                <span class="lock-icon">🔒</span>
+                <p>完成上一组解锁</p>
+            `;
+            section.appendChild(overlay);
+        }
+        
+        // 初始化特定项目的关卡
+        function initGameLevels(gameKey, gameNum, levelCount) {
+            const container = document.getElementById(`${gameKey}Levels`);
+            const progress = getProgress();
+            const testMode = localStorage.getItem('testMode') === 'true';
+
+            for (let i = 1; i <= levelCount; i++) {
+                const levelDiv = document.createElement('div');
+                levelDiv.className = 'level-card';
+
+                // 默认解锁所有关卡
+                const isUnlocked = true;
+                const currentProgress = progress[gameKey]?.[i - 1] || { completed: false, stars: 0 };
+
+                levelDiv.innerHTML = `
+                    <div class="level-number">${i}</div>
+                    <div class="level-stars">
+                        ${currentProgress.stars > 0 ? '⭐'.repeat(currentProgress.stars) : '☆☆☆'}
+                    </div>
+                `;
+
+                // 所有关卡都可以点击
+                levelDiv.onclick = () => {
+                    window.location.href = `${gameKey}-level${i}.html`;
+                };
+
+                container.appendChild(levelDiv);
+            }
+        }
+        
+        // 检查项目是否全部完成
+        function checkGameCompleted(gameKey) {
+            const progress = getProgress();
+            if (!progress[gameKey]) return false;
+            return progress[gameKey].every(level => level.completed);
+        }
+        
+        function updateTotalStars() {
+            const progress = getProgress();
+            let total = 0;
+            for (let game in progress) {
+                progress[game].forEach(level => {
+                    total += level.stars || 0;
+                });
+            }
+            document.getElementById('totalStars').textContent = total;
+        }
+        
+        // 举报按钮功能 - 打开举报表单
+        document.getElementById('reportBtn').addEventListener('click', function() {
+            showModal('reportFormModal');
+            // 清空表单
+            document.getElementById('reportType').value = '';
+            document.getElementById('reportDescription').value = '';
+            document.getElementById('reportContactInfo').value = '';
+        });
+
+        // 儿童隐私政策按钮功能
+        document.getElementById('privacyBtn').addEventListener('click', function() {
+            showModal('privacyModal');
+        });
+        
+        // 页面加载时初始化
+        window.onload = initLevels;
+    </script>
+</body>
+</html>
+

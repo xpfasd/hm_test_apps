@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第3关 - 数数项目</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="game-page">
+    <div class="container">
+        <div class="game-header">
+            <div class="back-btn" onclick="goHome()">⬅️</div>
+            <div class="game-info">
+                <div class="level-title">数数项目 • 第 3 关</div>
+                <div class="timer" id="timer">⏱️ 0秒</div>
+            </div>
+        </div>
+        <div class="game-area">
+            <div class="game-instruction">数一数有几只<br><strong id="targetAnimal">🐶</strong>？</div>
+            <div class="animals-grid" id="animalsGrid" style="grid-template-columns: repeat(4, 1fr); gap: 12px;"></div>
+            <div style="margin-top: 25px;">
+                <div style="font-size: 18px; color: #666; margin-bottom: 15px;">选择答案：</div>
+                <div id="answersGrid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 320px; margin: 0 auto;"></div>
+            </div>
+        </div>
+    </div>
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <h2>🎉 太棒了!</h2>
+            <div class="star-rating" id="starRating">⭐⭐⭐</div>
+            <p>你的数数能力真强！</p>
+            <p id="timeUsed">用时: 0秒</p>
+            <p id="resultTips" style="margin-top:15px;padding:10px;background:#fff3cd;border-radius:8px;font-size:14px;line-height:1.6;color:#856404;"></p>
+            <div>
+                <button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button>
+                <button class="btn btn-primary" onclick="nextLevel('game4', 3)">➡️ 下一关</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+    <script>
+        const ANIMALS = ['🐶', '🐱', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯'];
+        const GAME_CONFIG = { level: 3, game: 'game4', maxCount: 8 };
+        let startTime, timerInterval, correctAnswer;
+
+        function initGame() {
+            startTime = Date.now();
+            const targetAnimal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+            correctAnswer = Math.floor(Math.random() * GAME_CONFIG.maxCount) + 1;
+            
+            document.getElementById('targetAnimal').textContent = targetAnimal;
+            
+            const animals = [];
+            for (let i = 0; i < correctAnswer; i++) animals.push(targetAnimal);
+            const otherCount = 12 - correctAnswer;
+            for (let i = 0; i < otherCount; i++) {
+                const other = ANIMALS.filter(a => a !== targetAnimal);
+                animals.push(other[Math.floor(Math.random() * other.length)]);
+            }
+            animals.sort(() => Math.random() - 0.5);
+            
+            const grid = document.getElementById('animalsGrid');
+            grid.innerHTML = '';
+            animals.forEach(animal => {
+                const card = document.createElement('div');
+                card.className = 'animal-card';
+                card.style.fontSize = '44px';
+                card.textContent = animal;
+                card.style.cursor = 'default';
+                card.onclick = null;
+                grid.appendChild(card);
+            });
+            
+            const answersGrid = document.getElementById('answersGrid');
+            answersGrid.innerHTML = '';
+            for (let i = 1; i <= 8; i++) {
+                const btn = document.createElement('div');
+                btn.className = 'animal-card';
+                btn.style.background = 'linear-gradient(135deg, #a29bfe, #6c5ce7)';
+                btn.style.fontSize = '28px';
+                btn.style.cursor = 'pointer';
+                btn.textContent = i;
+                btn.onclick = () => checkAnswer(i, btn);
+                answersGrid.appendChild(btn);
+            }
+            
+            startTimer();
+        }
+
+        function checkAnswer(answer, btn) {
+            if (answer === correctAnswer) {
+                playSound('correct');
+                btn.classList.add('correct');
+                setTimeout(() => completeGame(), 500);
+            } else {
+                playSound('wrong');
+                btn.classList.add('wrong');
+                setTimeout(() => btn.classList.remove('wrong'), 1000);
+            }
+        }
+
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                document.getElementById('timer').textContent = `⏱️ ${elapsed}秒`;
+            }, 1000);
+        }
+
+        function completeGame() {
+            clearInterval(timerInterval);
+            const timeUsed = Math.floor((Date.now() - startTime) / 1000);
+            let stars = timeUsed <= 20 ? 3 : timeUsed <= 40 ? 2 : 1;
+            updateLevelProgress(GAME_CONFIG.game, GAME_CONFIG.level, stars);
+            playSound('win');
+            document.getElementById('starRating').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
+            document.getElementById('timeUsed').textContent = `用时: ${timeUsed}秒`;
+            setTimeout(() => showModal('resultModal'), 800);
+        }
+
+        window.onload = initGame;
+    </script>
+</body>
+</html>
+

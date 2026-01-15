@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第5关 - 排序小动物</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .sort-container {max-width:395px;margin:20px auto;}
+        .sort-instruction {text-align:center;font-size:19px;color:#666;margin-bottom:20px;}
+        .animals-list {display:flex;flex-direction:column;gap:10px;}
+        .animal-item {background:linear-gradient(135deg,#81ecec,#636efa);border-radius:18px;padding:13px 17px;display:flex;align-items:center;gap:15px;cursor:move;border:3px solid transparent;transition:all .2s;user-select:none;}
+        .animal-item.dragging {opacity:.5;border-color:#00b894;}
+        .animal-item .emoji {font-size:32px;}
+        .animal-item .stat-label {font-size:15px;color:#555;font-weight:bold;}
+        .check-btn {margin:20px auto 0;display:block;}
+    </style>
+</head>
+<body class="game-page">
+    <div class="container">
+        <div class="game-header"><div class="back-btn" onclick="goHome()">⬅️</div>
+            <div class="game-info"><div class="level-title">排序小动物 • 第 5 关 👑</div><div class="timer" id="timer">⏱️ 0秒</div></div>
+        </div>
+        <div class="game-area">
+            <div class="game-instruction" id="prompt"></div>
+            <div class="sort-container"><div class="sort-instruction" id="tip"></div><div class="animals-list" id="animalsList"></div><button class="btn btn-primary check-btn" onclick="checkOrder()">✓ 检查答案</button></div>
+        </div>
+    </div>
+    <div class="modal" id="resultModal"><div class="modal-content"><h2>🎉 恭喜通关!</h2><div class="star-rating" id="starRating">⭐⭐⭐</div><p>你是排序大师！🏆</p><p id="timeUsed">用时: 0秒</p><p id="resultTips" style="margin-top:15px;padding:10px;background:#fff3cd;border-radius:8px;font-size:14px;line-height:1.6;color:#856404;"></p><div><button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button><button class="btn btn-primary" onclick="goHome()">🏠 返回主页</button></div></div></div>
+    <script src="js/main.js"></script>
+    <script>
+const ANIMALS=[
+  {emoji:'🐦',weight:3,speed:8,age:1,label:'小鸟'},
+  {emoji:'🐢',weight:8,speed:1,age:80,label:'乌龟'},
+  {emoji:'🐭',weight:2,speed:5,age:2,label:'老鼠'},
+  {emoji:'🐱',weight:5,speed:7,age:8,label:'猫'},
+  {emoji:'🐰',weight:6,speed:9,age:5,label:'兔子'},
+  {emoji:'🦁',weight:12,speed:10,age:9,label:'狮子'},
+  {emoji:'🐷',weight:10,speed:3,age:6,label:'猪'}
+];
+const STATS=[
+  {key:'weight',chs:'体重(kg)',tip:'按体重从小到大排序'},
+  {key:'age',chs:'年龄(岁)',tip:'按年龄从小到大排序'},
+  {key:'speed',chs:'速度',tip:'按奔跑速度从慢到快排序'}
+];
+let selectedStat,correctOrder,currentOrder,timerInterval,startTime,errorCount=0;
+function initGame(){
+  errorCount=0;
+  selectedStat=STATS[Math.floor(Math.random()*STATS.length)];
+  document.getElementById('prompt').innerHTML=`请按 <b style='color:#3867d6'>${selectedStat.chs}</b> 从小到大排序`;
+  document.getElementById('tip').textContent=selectedStat.tip;
+  let idxArr=ANIMALS.map((a,i)=>i).sort(()=>Math.random()-.5);
+  currentOrder=[...idxArr];
+  correctOrder=ANIMALS.map((a,i)=>({val:a[selectedStat.key],idx:i})).sort((a,b)=>a.val-b.val).map(x=>x.idx);
+  renderAnimals();
+  startTime=Date.now();if(timerInterval)clearInterval(timerInterval);startTimer();
+}
+function renderAnimals(){
+  let list=document.getElementById('animalsList');list.innerHTML='';
+  currentOrder.forEach((idx,pos)=>{
+    let animal=ANIMALS[idx];
+    let div=document.createElement('div');
+    div.className='animal-item';
+    div.draggable=true;div.dataset.idx=idx;
+    div.innerHTML=`<div class="emoji">${animal.emoji}</div><div class="stat-label">${animal.label}|${selectedStat.chs}:${animal[selectedStat.key]}</div>`;
+    div.addEventListener('dragstart',handleDragStart);
+    div.addEventListener('dragover',handleDragOver);
+    div.addEventListener('drop',handleDrop);
+    div.addEventListener('dragend',handleDragEnd);
+    list.appendChild(div);
+  });
+}
+let dragSrcEl=null;
+function handleDragStart(e){dragSrcEl=this;this.classList.add('dragging');e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/html',this.innerHTML);}
+function handleDragOver(e){if(e.preventDefault){e.preventDefault();}e.dataTransfer.dropEffect='move';return false;}
+function handleDrop(e){if(e.stopPropagation){e.stopPropagation();}if(dragSrcEl!==this){let srcIdx=parseInt(dragSrcEl.dataset.idx);let tgtIdx=parseInt(this.dataset.idx);let srcPos=currentOrder.indexOf(srcIdx);let tgtPos=currentOrder.indexOf(tgtIdx);[currentOrder[srcPos],currentOrder[tgtPos]]=[currentOrder[tgtPos],currentOrder[srcPos]];renderAnimals();playSound('click');}return false;}
+function handleDragEnd(e){this.classList.remove('dragging');}
+function checkOrder(){
+  if(JSON.stringify(currentOrder)===JSON.stringify(correctOrder)){
+    playSound('correct');setTimeout(()=>passGame(),280);
+  }else{
+    playSound('wrong');errorCount++;alert('排序不对哦，再试试！');
+  }
+}
+function startTimer(){timerInterval=setInterval(()=>{let t=Math.floor((Date.now()-startTime)/1000);document.getElementById('timer').textContent=`⏱️ ${t}秒`;},1000);}
+function passGame(){clearInterval(timerInterval);let used=Math.floor((Date.now()-startTime)/1000),stars=3;if(used>65||errorCount>=5)stars=1;else if(used>40||errorCount>=2)stars=2;updateLevelProgress('game7',5,stars);playSound('win');document.getElementById('starRating').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);document.getElementById('timeUsed').textContent=`用时: ${used}秒`;showModal('resultModal');}
+window.onload=initGame;
+</script>
+</body>
+</html>

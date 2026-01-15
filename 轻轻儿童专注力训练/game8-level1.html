@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第1关 - 路径迷宫</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .maze-box{max-width:350px;margin:20px auto;background:#fffbdc;border-radius:18px;box-shadow:0 1px 12px #f9d79f44;padding:16px 8px 16px 8px;}
+        .maze {display: grid;grid-template-columns: repeat(3,48px);gap:8px;justify-content:center;align-items:center;}
+        .maze-cell {width:48px;height:48px;border-radius:10px;background:#fffbe6;box-shadow:0 0 2px #efc;justify-content:center;align-items:center;display:flex;font-size:38px;position:relative;transition:background .16s;}
+        .maze-cell.wall {background:#ffe7e7;box-shadow:0 0 4px #ffaea2;}
+        .maze-cell.goal {background:linear-gradient(135deg,#fffbe6 70%,#abe9cd 100%);}
+        .maze-cell.player {background:linear-gradient(135deg,#fcfcff 80%,#ffecd2 100%);border:2px solid #fbc531;z-index:2;}
+        .dir-btns {margin:20px auto 0;display:flex;flex-direction:column;align-items:center;gap:8px;}
+        .dir-row{display:flex;gap:16px;}
+        .dir-btn{width:48px;height:48px;background:#fffbe6;border:2px solid #e4c16c;border-radius:13px;text-align:center;display:flex;align-items:center;justify-content:center;font-size:30px;cursor:pointer;transition:background .13s;}
+        .dir-btn:active{background:#ffedb1;}
+        .maze-status{margin:8px 0 0;text-align:center;color:#686647;}
+    </style>
+</head>
+<body class="game-page">
+    <div class="container">
+        <div class="game-header"><div class="back-btn" onclick="goHome()">⬅️</div>
+            <div class="game-info"><div class="level-title">路径迷宫 • 第 1 关</div><div class="timer" id="timer">⏱️ 0秒</div></div>
+        </div>
+        <div class="game-area">
+            <div class="game-instruction">帮助🦊找到糖果🍬，点击方向按钮或键盘↑↓←→</div>
+            <div class="maze-box"><div class="maze" id="maze"></div></div>
+            <div class="dir-btns">
+                <div class="dir-row"><button class="dir-btn" onclick="movePlayer(0,-1)">⬆️</button></div>
+                <div class="dir-row"><button class="dir-btn" onclick="movePlayer(-1,0)">⬅️</button><div style="width:46px"></div><button class="dir-btn" onclick="movePlayer(1,0)">➡️</button></div>
+                <div class="dir-row"><button class="dir-btn" onclick="movePlayer(0,1)">⬇️</button></div>
+            </div>
+            <div class="maze-status" id="mazeStatus"></div>
+        </div>
+    </div>
+    <div class="modal" id="resultModal">
+        <div class="modal-content"><h2>🎉 太棒了!</h2>
+            <div class="star-rating" id="starRating">⭐⭐⭐</div>
+            <p>小狐狸顺利到达糖果！</p>
+            <p id="timeUsed">用时: 0秒</p>
+            <p id="resultTips" style="margin-top:15px;padding:10px;background:#fff3cd;border-radius:8px;font-size:14px;line-height:1.6;color:#856404;"></p>
+            <div><button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button><button class="btn btn-primary" onclick="nextLevel('game8',1)">➡️ 下一关</button></div>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+    <script>
+    // 1=路，9=墙，2=终点
+    const MAZE = [
+      [1,9,1],
+      [1,1,1],
+      [9,1,2]
+    ];
+    const W=3,H=3,STARTX=0,STARTY=0;
+    let player={x:STARTX,y:STARTY},moveCnt=0,errorCnt=0,timerInt,startTime;
+    function renderMaze(){
+      let mazeDom=document.getElementById('maze');mazeDom.innerHTML='';
+      for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+        let cell=document.createElement('div');
+        cell.className='maze-cell';
+        if(MAZE[y][x]===9)cell.classList.add('wall');
+        if(MAZE[y][x]===2)cell.classList.add('goal'),cell.innerHTML='🍬';
+        if(player.x===x&&player.y===y)cell.classList.add('player'),cell.innerHTML='🦊';
+        mazeDom.appendChild(cell);}}
+    function movePlayer(dx,dy){
+      let nx=player.x+dx,ny=player.y+dy;
+      if(nx<0||ny<0||nx>=W||ny>=H)return shakeMsg('不能出界');
+      if(MAZE[ny][nx]===9)return shakeMsg('撞到墙啦');
+      playSound('click');
+      player.x=nx;player.y=ny;moveCnt++;
+      renderMaze();
+      if(MAZE[ny][nx]===2)return setTimeout(passGame,350);
+    }
+    function shakeMsg(msg){
+      playSound('wrong');document.getElementById('mazeStatus').textContent=msg;let dom=document.querySelector('.maze-box');dom.style.animation='shake .5s';setTimeout(()=>{dom.style.animation=''},510);}
+    function startTimer(){startTime=Date.now();moveCnt=0;errorCnt=0;
+      if(timerInt)clearInterval(timerInt);
+      timerInt=setInterval(()=>{
+        let t=Math.floor((Date.now()-startTime)/1000);
+        document.getElementById('timer').textContent=`⏱️ ${t}秒`;
+      },1000);
+    }
+    function passGame(){clearInterval(timerInt);
+      let used=Math.floor((Date.now()-startTime)/1000),stars=3;
+      if(used>25||moveCnt>13)stars=1;else if(used>12||moveCnt>10)stars=2;
+      updateLevelProgress('game8',1,stars);playSound('win');
+      document.getElementById('starRating').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);document.getElementById('timeUsed').textContent=`用时: ${used}秒`;
+      showModal('resultModal');
+    }
+    document.onkeydown=function(e){
+      const map={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
+      if(map[e.key]){let[d1,d2]=map[e.key];movePlayer(d1,d2);}}
+    window.onload=function(){player={x:STARTX,y:STARTY};renderMaze();startTimer();document.getElementById('mazeStatus').textContent='';}
+    </script>
+</body>
+</html>

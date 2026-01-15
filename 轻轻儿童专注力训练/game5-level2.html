@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第2关 - 形状找一找</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .shapes-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            max-width: 340px;
+            margin: 18px auto 0;
+        }
+        .shape-card {
+            background: white;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            cursor: pointer;
+            border: 4px solid transparent;
+            min-height: 80px;
+            transition: box-shadow .2s, border-color .2s, transform .15s;
+        }
+        .shape-card.correct {
+            border-color: #4ecdc4;
+            box-shadow: 0 0 10px #4ecdc4aa;
+            animation: bounce 0.6s;
+            background: #d6fcf5;
+        }
+        .shape-card.wrong {
+            border-color: #e17055;
+            animation: shake .5s;
+            background: #ffe7e5;
+        }
+        .shape-card.found {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .shape-status-bar {
+            margin: 14px auto 8px;
+            font-size: 18px;
+            color: #555;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="game-page">
+    <div class="container">
+        <div class="game-header">
+            <div class="back-btn" onclick="goHome()">⬅️</div>
+            <div class="game-info">
+                <div class="level-title">形状找一找 • 第 2 关</div>
+                <div class="timer" id="timer">⏱️ 0秒</div>
+            </div>
+        </div>
+        <div class="game-area">
+            <div class="game-instruction">
+                找出所有 <span style="color:#0984e3;font-weight:bold">蓝色正方形</span> <span style="font-size:28px;">🟦</span>
+            </div>
+            <div class="shape-status-bar">
+                已找到 <b id="foundCount">0</b> / <b id="totalCount">0</b>
+            </div>
+            <div class="shapes-grid" id="shapesGrid"></div>
+        </div>
+    </div>
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <h2>🎉 太棒了!</h2>
+            <div class="star-rating" id="starRating">⭐⭐⭐</div>
+            <p id="endText">全部蓝色正方形都被你找出来啦！</p>
+            <p id="timeUsed">用时: 0秒</p>
+            <p id="resultTips" style="margin-top:15px;padding:10px;background:#fff3cd;border-radius:8px;font-size:14px;line-height:1.6;color:#856404;"></p>
+            <div>
+                <button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button>
+                <button class="btn btn-primary" onclick="nextLevel('game5', 2)">➡️ 下一关</button>
+            </div>
+        </div>
+    </div>
+    <script src="js/main.js"></script>
+    <script>
+        const SHAPES = [
+            { icon: '🟦', color: '#0984e3', type: 'blue-square', isTarget: true },
+            { icon: '🟦', color: '#0984e3', type: 'blue-square', isTarget: true },
+            { icon: '🟧', color: '#fdcb6e', type: 'orange-square', isTarget: false },
+            { icon: '🟩', color: '#00b894', type: 'green-square', isTarget: false },
+            { icon: '🟥', color: '#e17055', type: 'red-square', isTarget: false },
+            { icon: '🟦', color: '#0984e3', type: 'blue-square', isTarget: true },
+            { icon: '🔺', color: '#ff7675', type: 'red-triangle', isTarget: false },
+            { icon: '🔵', color: '#0984e3', type: 'blue-circle', isTarget: false },
+            { icon: '🟦', color: '#0984e3', type: 'blue-square', isTarget: true }
+        ];
+        let targets, found, canClick=true;
+        let timerInterval, startTime, errorCount=0;
+
+        function renderShapes() {
+            let grid = document.getElementById('shapesGrid');
+            let shuffled = [...SHAPES].sort(() => Math.random()-0.5);
+            grid.innerHTML = '';
+            found = 0;
+            targets = shuffled.filter(s => s.isTarget).length;
+            document.getElementById('foundCount').textContent = 0;
+            document.getElementById('totalCount').textContent = targets;
+            shuffled.forEach((item, idx) => {
+                let div = document.createElement('div');
+                div.className = 'shape-card';
+                div.innerHTML = `<span style="color:${item.color};font-size:44px;">${item.icon}</span>`;
+                div.title = item.type;
+                div.onclick = () => selectShape(div,item.isTarget);
+                grid.appendChild(div);
+            });
+        }
+
+        function selectShape(card,isTarget) {
+            if(!canClick||card.classList.contains('found'))return;
+            if(isTarget) {
+                playSound('correct');
+                card.classList.add('correct','found');
+                found++;
+                document.getElementById('foundCount').textContent = found;
+                if(found===targets) setTimeout(()=>passGame(), 400);
+            } else {
+                playSound('wrong');
+                card.classList.add('wrong');
+                errorCount++;
+                setTimeout(()=>card.classList.remove('wrong'),650);
+            }
+        }
+
+        function startTimer() {
+            startTime=Date.now();
+            timerInterval=setInterval(()=>{
+                let t=Math.floor((Date.now()-startTime)/1000);
+                document.getElementById('timer').textContent=`⏱️ ${t}秒`;
+            },1000);
+        }
+
+        function passGame() {
+            clearInterval(timerInterval);
+            let used = Math.floor((Date.now()-startTime)/1000);
+            let stars = 3;
+            if(used>30||errorCount>=4)stars=1;else if(used>20||errorCount>=2)stars=2;
+            updateLevelProgress('game5',2,stars);
+            playSound('win');
+            document.getElementById('starRating').textContent = '⭐'.repeat(stars)+'☆'.repeat(3-stars);
+            document.getElementById('timeUsed').textContent = `用时: ${used}秒`;
+            showModal('resultModal');
+        }
+
+        window.onload = function() {
+            renderShapes();
+            startTimer();
+            errorCount = 0;
+        }
+    </script>
+</body>
+</html>

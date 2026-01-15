@@ -1,0 +1,37 @@
+/* 
+ * 本地字体配置 - 所有字体已下载到本地
+ */
+
+/* Fredoka 字体 - 英文/数字显示 */
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./Fredoka-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fredoka';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./Fredoka-SemiBold.woff2') format('woff2');
+}
+
+/* Noto Sans SC 中文字体 */
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./NotoSansSC-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Noto Sans SC';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./NotoSansSC-Bold.woff2') format('woff2');
+}

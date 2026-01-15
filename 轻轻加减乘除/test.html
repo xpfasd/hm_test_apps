@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试页面 - 数学小天才</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .emoji {
+            font-size: 4rem;
+            margin: 20px 0;
+        }
+        
+        p {
+            color: #666;
+            line-height: 1.8;
+            margin: 15px 0;
+        }
+        
+        .buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        a {
+            display: inline-block;
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        
+        a:hover {
+            transform: scale(1.05);
+        }
+        
+        .secondary {
+            background: #4CAF50;
+        }
+        
+        .warning {
+            background: #FF9800;
+        }
+        
+        .info {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            text-align: left;
+        }
+        
+        .info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .info ul {
+            color: #666;
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .info li {
+            margin: 5px 0;
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .status.success {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+        
+        .status.error {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 数学小天才测试页面</h1>
+        
+        <div class="emoji">🌟</div>
+        
+        <p>
+            欢迎使用数学小天才应用！<br>
+            这是一个专为小学低年级学生设计的数学练习应用。
+        </p>
+        
+        <div class="buttons">
+            <a href="index.html">启动应用</a>
+            <a href="icon-generator.html" class="secondary">生成图标</a>
+            <a href="#" onclick="testLocalStorage()" class="warning">测试存储</a>
+        </div>
+        
+        <div class="info">
+            <h3>📋 功能特性</h3>
+            <ul>
+                <li>✅ 加减乘除四种运算</li>
+                <li>✅ 每种运算20个子类别</li>
+                <li>✅ 每个类别100道题目</li>
+                <li>✅ 丰富的动画演示</li>
+                <li>✅ 自动保存学习进度</li>
+                <li>✅ 支持离线使用（PWA）</li>
+            </ul>
+        </div>
+        
+        <div id="status" class="status" style="display: none;"></div>
+        
+        <div class="info">
+            <h3>🚀 使用说明</h3>
+            <ul>
+                <li>点击"启动应用"开始使用</li>
+                <li>点击"生成图标"创建应用图标</li>
+                <li>在手机浏览器中可以"添加到主屏幕"</li>
+                <li>支持Chrome、Safari、Firefox等现代浏览器</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // 测试LocalStorage功能
+        function testLocalStorage() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.style.display = 'block';
+            
+            try {
+                // 测试写入
+                const testData = {
+                    timestamp: new Date().toISOString(),
+                    test: '测试数据',
+                    random: Math.random()
+                };
+                
+                localStorage.setItem('test', JSON.stringify(testData));
+                
+                // 测试读取
+                const retrieved = JSON.parse(localStorage.getItem('test'));
+                
+                if (retrieved && retrieved.random === testData.random) {
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = '✅ LocalStorage 测试成功！数据可以正常保存和读取。';
+                    
+                    // 清理测试数据
+                    localStorage.removeItem('test');
+                } else {
+                    throw new Error('数据读取不匹配');
+                }
+            } catch (e) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ LocalStorage 测试失败：' + e.message;
+            }
+        }
+        
+        // 检测PWA支持
+        window.addEventListener('load', () => {
+            const statusDiv = document.getElementById('status');
+            
+            if ('serviceWorker' in navigator) {
+                console.log('✅ 浏览器支持 Service Worker');
+            } else {
+                console.log('❌ 浏览器不支持 Service Worker');
+            }
+            
+            // 检测是否已安装
+            if (window.matchMedia('(display-mode: standalone)').matches) {
+                console.log('✅ 应用已安装为PWA');
+            }
+        });
+    </script>
+</body>
+</html>

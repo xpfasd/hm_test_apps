@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第5关 - 记忆图案</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>body{background:#fffbe6;}.memory-area{max-width:430px;margin:24px auto 15px auto;background:#fff;border-radius:19px;box-shadow:0 2px 18px #ffe08244;padding:10px 5px 24px 5px;text-align:center;}.view-row,.choose-row{display:flex;justify-content:center;gap:7px;margin:8px 0;}.mem-img{width:34px;height:34px;border-radius:9px;background:#fadeef;display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 1px 4px #ffd6ff;transition:transform .14s;}.choice{width:34px;height:34px;border-radius:9px;background:#f1f8e9;display:flex;align-items:center;justify-content:center;font-size:15px;box-shadow:0 1px 1px #ced99b;cursor:pointer;transition:transform .14s,background .14s;}.choice.selected{background:#ffe1fa;transform:scale(1.13);}.choice.correct{background:#faffd2;animation:bounce .7s;}.choice.wrong{background:#ffe0e0;animation:shake .5s;}.check-btn{margin-top:6px;font-size:14px;padding:3px 11px;border-radius:6px;background:#ffe6ae;border:none;color:#917211;font-weight:bold;cursor:pointer;box-shadow:0 1px 2px #e7c272;transition:background .13s;}.check-btn:active{background:#fedc96;}</style>
+</head>
+<body class="game-page">
+<div class="container">
+    <div class="game-header">
+        <div class="back-btn" onclick="goHome()">⬅️</div>
+        <div class="game-info"><div class="level-title">记忆图案 • 第5关</div><div class="timer" id="timer">⏱️ 0秒</div></div>
+    </div>
+    <div class="game-area">
+        <div class="game-instruction">8只动物，展示0.85秒！极限脑力大考验，可拖动/点选换顺序，还原后提交！</div>
+        <div class="memory-area">
+            <div class="view-row" id="memoryRow"></div>
+            <div style="font-size:12px; color:#888; margin:5px 0">长按拖动/点选换位，然后点击“提交”验证</div>
+            <div class="choose-row" id="choiceRow"></div>
+            <button class="check-btn" id="checkBtn" onclick="checkResult()">提交</button>
+        </div>
+    </div>
+</div>
+<div class="modal" id="resultModal">
+    <div class="modal-content"><h2 id="resultTitle"></h2>
+        <div class="star-rating" id="starRating">⭐⭐⭐</div>
+        <p id="resultMsg"></p>
+        <p id="timeUsed"></p>
+        <div><button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button><button class="btn btn-primary" onclick="goHome()">🏠 返回主页</button></div>
+    </div>
+</div>
+<script src="js/main.js"></script>
+<script>
+const source = [
+    {animal:'🦊'},{animal:'🐸'},{animal:'🐥'},{animal:'🦀'},{animal:'🐰'},{animal:'🐹'},{animal:'🦁'},{animal:'🐻'}
+];
+let memory=[],choices=[],draggingIdx=null,timerInt,startTime;
+function shuffle(arr){return arr.sort(()=>Math.random()-.5)}
+function renderMemory(){const row=document.getElementById('memoryRow');row.innerHTML='';memory.forEach(item=>{let dom=document.createElement('div');dom.className='mem-img';dom.textContent=item.animal;row.appendChild(dom);})}
+function renderChoices(){const row=document.getElementById('choiceRow');row.innerHTML='';choices.forEach((item,idx)=>{let dom=document.createElement('div');dom.className='choice';dom.textContent=item.animal;dom.onclick=()=>selectSwap(idx);dom.draggable=true;dom.ondragstart=(e)=>{draggingIdx=idx;e.dataTransfer.effectAllowed='move';};dom.ondragover=(e)=>{e.preventDefault();};dom.ondrop=(e)=>{if(draggingIdx!==null&&draggingIdx!==idx){let tmp=choices[draggingIdx];choices[draggingIdx]=choices[idx];choices[idx]=tmp;renderChoices();draggingIdx=null;}};row.appendChild(dom);})}
+let swapFirst=null;
+function selectSwap(idx){if(swapFirst==null){swapFirst=idx;document.querySelectorAll('.choice')[idx].classList.add('selected');}else if(swapFirst!==idx){let t=choices[swapFirst];choices[swapFirst]=choices[idx];choices[idx]=t;swapFirst=null;renderChoices();}else{swapFirst=null;renderChoices();}}
+function checkResult(){let arr=choices.map(v=>v.animal),ans=memory.map(v=>v.animal),correct=arr.join()==ans.join();let used=Math.floor((Date.now()-startTime)/1000),stars=3;if(!correct){showFinal(false,used,1);return;}if(used>43)stars=1;else if(used>29)stars=2;showFinal(true,used,stars);updateLevelProgress('game9',5,stars);}
+function showFinal(ok,used,stars){showModal('resultModal');document.getElementById('resultTitle').textContent=ok?'🏅 极限通关':'😵 再来一次';document.getElementById('resultMsg').textContent=ok?'记忆+操作双满分，太棒了！':'顺序错了，挑战继续！';document.getElementById('starRating').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);document.getElementById('timeUsed').textContent=`用时: ${used}秒`;playSound(ok?'win':'wrong');if(!ok&&navigator.vibrate)navigator.vibrate([150,60,100]);}
+window.onload=function(){memory=shuffle(source.slice());choices=shuffle(source.slice());renderMemory();setTimeout(()=>{document.getElementById('memoryRow').style.visibility='hidden';renderChoices();startTime=Date.now();},850);document.getElementById('memoryRow').style.visibility='visible';document.getElementById('checkBtn').disabled=false;document.getElementById('timer').textContent='⏱️ 0秒';if(timerInt)clearInterval(timerInt);timerInt=setInterval(()=>{let t=Math.floor((Date.now()-startTime)/1000)||0;document.getElementById('timer').textContent=`⏱️ ${t}秒`;},1000);}
+</script>
+</body>
+</html>
+

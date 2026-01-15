@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轻轻应用汇总</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 48px;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.9);
+            font-size: 18px;
+            margin-bottom: 50px;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            padding: 20px 0;
+        }
+
+        .app-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .app-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .app-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .app-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .category {
+            display: inline-block;
+            padding: 5px 15px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            font-size: 12px;
+            color: #666;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>轻轻应用汇总</h1>
+        <div class="subtitle">儿童教育与成长应用集合</div>
+
+        <div class="apps-grid">
+            <a href="心灵奇旅/index.html" class="app-card">
+                <div class="app-icon">🧠</div>
+                <div class="app-name">心灵奇旅</div>
+                <div class="app-desc">少年心理成长训练</div>
+                <span class="category">心理健康</span>
+            </a>
+
+            <a href="轻轻儿童编程/index.html" class="app-card">
+                <div class="app-icon">💻</div>
+                <div class="app-name">轻轻儿童编程</div>
+                <div class="app-desc">趣味编程启蒙教育</div>
+                <span class="category">编程教育</span>
+            </a>
+
+            <a href="轻轻儿童财商训练/index.html" class="app-card">
+                <div class="app-icon">💰</div>
+                <div class="app-name">轻轻儿童财商训练</div>
+                <div class="app-desc">培养理财意识与能力</div>
+                <span class="category">财商教育</span>
+            </a>
+
+            <a href="轻轻儿童健康训练/index.html" class="app-card">
+                <div class="app-icon">🏃</div>
+                <div class="app-name">轻轻儿童健康训练</div>
+                <div class="app-desc">健康生活习惯养成</div>
+                <span class="category">健康教育</span>
+            </a>
+
+            <a href="轻轻儿童情商训练/index.html" class="app-card">
+                <div class="app-icon">❤️</div>
+                <div class="app-name">轻轻儿童情商训练</div>
+                <div class="app-desc">情绪管理与社交能力</div>
+                <span class="category">情商培养</span>
+            </a>
+
+            <a href="轻轻儿童职业训练/index.html" class="app-card">
+                <div class="app-icon">👔</div>
+                <div class="app-name">轻轻儿童职业训练</div>
+                <div class="app-desc">职业认知与规划启蒙</div>
+                <span class="category">职业教育</span>
+            </a>
+
+            <a href="轻轻儿童智商训练/index.html" class="app-card">
+                <div class="app-icon">🎯</div>
+                <div class="app-name">轻轻儿童智商训练</div>
+                <div class="app-desc">逻辑思维能力提升</div>
+                <span class="category">智力开发</span>
+            </a>
+
+            <a href="轻轻儿童专注力训练/index.html" class="app-card">
+                <div class="app-icon">🎪</div>
+                <div class="app-name">轻轻儿童专注力训练</div>
+                <div class="app-desc">注意力集中训练</div>
+                <span class="category">专注力</span>
+            </a>
+
+            <a href="轻轻加减乘除/index.html" class="app-card">
+                <div class="app-icon">🔢</div>
+                <div class="app-name">轻轻加减乘除</div>
+                <div class="app-desc">数学基础运算练习</div>
+                <span class="category">数学教育</span>
+            </a>
+
+            <a href="轻轻脑力训练/index.html" class="app-card">
+                <div class="app-icon">🧩</div>
+                <div class="app-name">轻轻脑力训练</div>
+                <div class="app-desc">全面脑力开发训练</div>
+                <span class="category">脑力开发</span>
+            </a>
+
+            <a href="轻轻学汉字/index.html" class="app-card">
+                <div class="app-icon">📝</div>
+                <div class="app-name">轻轻学汉字</div>
+                <div class="app-desc">趣味汉字学习</div>
+                <span class="category">语言学习</span>
+            </a>
+
+            <a href="轻轻AI实验室/index.html" class="app-card">
+                <div class="app-icon">🤖</div>
+                <div class="app-name">轻轻AI实验室</div>
+                <div class="app-desc">人工智能启蒙教育</div>
+                <span class="category">科技教育</span>
+            </a>
+
+            <a href="轻轻博弈论/index.html" class="app-card">
+                <div class="app-icon">♟️</div>
+                <div class="app-name">轻轻博弈论</div>
+                <div class="app-desc">策略思维培养</div>
+                <span class="category">思维训练</span>
+            </a>
+
+            <a href="少儿计算机实验室/index.html" class="app-card">
+                <div class="app-icon">🖥️</div>
+                <div class="app-name">少儿计算机实验室</div>
+                <div class="app-desc">计算机科学启蒙</div>
+                <span class="category">计算机教育</span>
+            </a>
+
+            <a href="儿童哲学启蒙/index.html" class="app-card">
+                <div class="app-icon">🤔</div>
+                <div class="app-name">儿童哲学启蒙</div>
+                <div class="app-desc">哲学思维培养</div>
+                <span class="category">哲学教育</span>
+            </a>
+
+            <a href="儿童艺术启蒙训练/index.html" class="app-card">
+                <div class="app-icon">🎨</div>
+                <div class="app-name">儿童艺术启蒙训练</div>
+                <div class="app-desc">艺术创造力培养</div>
+                <span class="category">艺术教育</span>
+            </a>
+
+            <a href="儿童图形逻辑训练/index.html" class="app-card">
+                <div class="app-icon">🔷</div>
+                <div class="app-name">儿童图形逻辑训练</div>
+                <div class="app-desc">图形与逻辑思维</div>
+                <span class="category">逻辑训练</span>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

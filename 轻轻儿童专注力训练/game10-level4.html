@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>第4关 - 反应点击</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .reaction-area{position:relative;width:100%;max-width:380px;height:380px;margin:20px auto;background:linear-gradient(135deg,#a8edea,#fed6e3);border-radius:20px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.15);}
+        .target-animal{position:absolute;font-size:38px;cursor:pointer;transition:all .25s;animation:appear .3s;}
+        .target-animal:active{transform:scale(.9);}
+        @keyframes appear{from{transform:scale(0);}to{transform:scale(1);}}
+        .score-display{text-align:center;font-size:22px;color:#666;margin:15px 0;}
+        .score-num{font-size:32px;font-weight:bold;color:#ff6b6b;}
+    </style>
+</head>
+<body class="game-page">
+    <div class="container">
+        <div class="game-header"><div class="back-btn" onclick="goHome()">⬅️</div>
+            <div class="game-info"><div class="level-title">反应点击 • 第 4 关</div><div class="timer" id="timer">⏱️ 25秒</div></div>
+        </div>
+        <div class="game-area">
+            <div class="game-instruction">只点击<strong>🐼</strong>，不要点其它！<br><small style="color:#e17055">25秒内点到15只！干扰更多！</small></div>
+            <div class="score-display">得分：<span class="score-num" id="score">0</span> / 15</div>
+            <div class="reaction-area" id="reactionArea"></div>
+        </div>
+    </div>
+    <div class="modal" id="resultModal">
+        <div class="modal-content"><h2>🎉 太棒了!</h2>
+            <div class="star-rating" id="starRating">⭐⭐⭐</div>
+            <p>专注力满分！</p>
+            <p id="finalScore"></p>
+            <div><button class="btn btn-secondary" onclick="retryLevel()">🔄 再玩一次</button><button class="btn btn-primary" onclick="nextLevel('game10',4)">➡️ 下一关</button></div>
+        </div>
+    </div>
+    <div class="modal" id="failModal">
+        <div class="modal-content"><h2>⏰ 时间到!</h2><p>再试一次，你可以更快！</p><div><button class="btn btn-secondary" onclick="goHome()">🏠 返回主页</button><button class="btn btn-primary" onclick="retryLevel()">🔄 重新开始</button></div></div>
+    </div>
+    <script src="js/main.js"></script>
+    <script>
+    const TARGET='🐼',OTHERS=['🐶','🐱','🐰','🦊','🐻','🐨','🐯'],GOAL=15,TIME_LIMIT=25;
+    let score=0,timeRemain=TIME_LIMIT,timerInt,spawnInt,gameCompleted=false,errorCount=0;
+    function initGame(){
+      score=0;timeRemain=TIME_LIMIT;gameCompleted=false;errorCount=0;
+      document.getElementById('score').textContent=score;
+      document.getElementById('timer').textContent=`⏱️ ${timeRemain}秒`;
+      startTimer();
+      startSpawning();
+    }
+    function startTimer(){
+      const timerEl=document.getElementById('timer');
+      timerInt=setInterval(()=>{
+        timeRemain--;
+        timerEl.textContent=`⏱️ ${timeRemain}秒`;
+        if(timeRemain<=8)timerEl.style.color='#e17055';
+        if(timeRemain<=0){
+          clearInterval(timerInt);clearInterval(spawnInt);
+          if(!gameCompleted){gameCompleted=true;showModal('failModal');}
+        }
+      },1000);
+    }
+    function startSpawning(){
+      spawnInt=setInterval(()=>{
+        if(gameCompleted)return;
+        spawnAnimal();
+      },900);
+    }
+    function spawnAnimal(){
+      const area=document.getElementById('reactionArea');
+      const isTarget=Math.random()>0.5;
+      const animal=document.createElement('div');
+      animal.className='target-animal';
+      animal.textContent=isTarget?TARGET:OTHERS[Math.floor(Math.random()*OTHERS.length)];
+      const maxX=area.clientWidth-45;
+      const maxY=area.clientHeight-45;
+      animal.style.left=Math.random()*maxX+'px';
+      animal.style.top=Math.random()*maxY+'px';
+      animal.onclick=()=>clickAnimal(animal,isTarget);
+      area.appendChild(animal);
+      setTimeout(()=>{if(animal.parentNode)animal.remove();},1300);
+    }
+    function clickAnimal(el,isTarget){
+      el.remove();
+      if(isTarget){
+        playSound('correct');
+        score++;
+        document.getElementById('score').textContent=score;
+        if(score>=GOAL){
+          clearInterval(timerInt);clearInterval(spawnInt);
+          gameCompleted=true;
+          setTimeout(()=>passGame(),400);
+        }
+      }else{
+        playSound('wrong');
+        errorCount++;
+      }
+    }
+    function passGame(){
+      let used=TIME_LIMIT-timeRemain,stars=3;
+      if(used>22||errorCount>=8)stars=1;else if(used>18||errorCount>=5)stars=2;
+      updateLevelProgress('game10',4,stars);
+      playSound('win');
+      document.getElementById('starRating').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+      document.getElementById('finalScore').textContent=`完成时间：${used}秒`;
+      showModal('resultModal');
+    }
+    window.onload=initGame;
+    </script>
+</body>
+</html>
+

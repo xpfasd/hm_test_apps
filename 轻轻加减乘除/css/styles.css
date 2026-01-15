@@ -1,0 +1,752 @@
+/* 基础样式重置 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    overflow-x: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+}
+
+.page {
+    display: none;
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.page.active {
+    display: block;
+}
+
+/* 首页样式 */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    animation: bounce 2s infinite;
+}
+
+.header h2 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    opacity: 0.95;
+}
+
+.operations-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    max-width: 600px;
+    margin: 0 auto 40px;
+}
+
+.operation-card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.operation-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+    transform: scale(0);
+    transition: transform 0.5s ease;
+}
+
+.operation-card:active::before {
+    transform: scale(1);
+}
+
+.operation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+
+.operation-card.addition {
+    background: linear-gradient(135deg, #FF6B6B, #FFE66D);
+}
+
+.operation-card.subtraction {
+    background: linear-gradient(135deg, #4ECDC4, #44A08D);
+}
+
+.operation-card.multiplication {
+    background: linear-gradient(135deg, #FA8BFF, #2BD2FF);
+}
+
+.operation-card.division {
+    background: linear-gradient(135deg, #FFB75E, #ED8F03);
+}
+
+.operation-card .icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+
+.operation-card .title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.operation-card .desc {
+    font-size: 1rem;
+    color: rgba(255,255,255,0.9);
+}
+
+/* 进度概览 */
+.progress-overview {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    display: none;
+}
+
+.progress-overview h3 {
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.progress-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    gap: 10px;
+}
+
+.progress-item span:first-child {
+    width: 50px;
+    font-weight: bold;
+    color: #666;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 20px;
+    background: #e5e7eb;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s ease;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.progress-text {
+    width: 60px;
+    text-align: right;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* 隐藏首页“学习进度”里的 0/100 文本，不影响成就页圆环文字 */
+.progress-overview .progress-text {
+    display: none;
+}
+
+/* 类别选择页 */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.category-item {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.category-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.category-item .emoji {
+    font-size: 2rem;
+    margin-bottom: 8px;
+}
+
+.category-item .name {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.category-item .range {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* 练习页样式 */
+.practice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.back-btn {
+    background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+    border: none;
+    font-size: 1.3rem;
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(255, 107, 107, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.back-btn:hover {
+    background: linear-gradient(135deg, #FF5252, #FF7043);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 107, 107, 0.4);
+}
+
+.back-btn:active {
+    transform: translateY(0);
+}
+
+.question-counter {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #333;
+}
+
+.score {
+    font-size: 1.1rem;
+    color: #667eea;
+    font-weight: bold;
+}
+
+.question-area {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.question-display {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-weight: bold;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.answer-area {
+    display: flex;
+    gap: 15px;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+#answerInput {
+    flex: 1;
+    padding: 15px 20px;
+    font-size: 1.5rem;
+    border: 3px solid #e0e0e0;
+    border-radius: 12px;
+    text-align: center;
+    transition: border-color 0.3s ease;
+}
+
+#answerInput:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+#submitBtn {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s ease;
+}
+
+#submitBtn:hover {
+    transform: scale(1.05);
+}
+
+#submitBtn:active {
+    transform: scale(0.98);
+}
+
+.feedback {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.feedback.hidden {
+    display: none;
+}
+
+.feedback.correct {
+    background: #4CAF50;
+    color: white;
+}
+
+.feedback.wrong {
+    background: #f44336;
+    color: white;
+}
+
+/* 动画区域 */
+.animation-area {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    min-height: 300px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 结果页样式 */
+.result-container {
+    background: white;
+    border-radius: 25px;
+    padding: 40px 30px;
+    max-width: 500px;
+    margin: 50px auto;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    text-align: center;
+}
+
+.result-container h2 {
+    color: #333;
+    font-size: 2rem;
+    margin-bottom: 30px;
+}
+
+.result-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
+}
+
+.stat-item {
+    flex: 1;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.result-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.btn-primary, .btn-secondary {
+    flex: 1;
+    padding: 15px 20px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.btn-secondary {
+    background: #f0f0f0;
+    color: #333;
+}
+
+.btn-primary:hover, .btn-secondary:hover {
+    transform: scale(1.05);
+}
+
+.achievement {
+    margin-top: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    border-radius: 15px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: none;
+}
+
+.achievement.show {
+    display: block;
+    animation: bounceIn 0.5s ease;
+}
+
+/* 举报按钮样式 */
+.report-button-container {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.report-btn {
+    background: linear-gradient(135deg, #FF9800, #F44336);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.report-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(244, 67, 54, 0.4);
+}
+
+.report-btn:active {
+    transform: translateY(0);
+}
+
+.report-icon {
+    font-size: 1.3rem;
+}
+
+/* 自定义弹窗样式 */
+.modal-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+}
+
+.modal-container.show {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.3s ease;
+}
+
+.modal {
+    display: none;
+    max-width: 500px;
+    width: 90%;
+    margin: 20px;
+}
+
+.modal.show {
+    display: block;
+    animation: slideInUp 0.3s ease;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
+
+.modal-header {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.modal-header h3 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.modal-body {
+    padding: 30px;
+}
+
+.modal-body p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.6;
+}
+
+.modal-footer {
+    padding: 20px;
+    background: #f8f9fa;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.modal-btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.modal-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.modal-btn-secondary {
+    background: #e0e0e0;
+    color: #333;
+}
+
+.modal-btn-secondary:hover {
+    background: #d0d0d0;
+}
+
+/* 成功弹窗样式 */
+.modal-success {
+    text-align: center;
+    padding: 40px;
+}
+
+.modal-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    animation: bounceIn 0.5s ease;
+}
+
+.modal-success h3 {
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+.modal-success p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* 表单样式 */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+textarea.form-control {
+    resize: vertical;
+    font-family: inherit;
+}
+
+/* 弹窗动画 */
+@keyframes slideInUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 响应式设计 */
+@media (max-width: 480px) {
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .operations-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .question-display {
+        font-size: 2rem;
+    }
+    
+    .answer-area {
+        flex-direction: column;
+    }
+    
+    #submitBtn {
+        width: 100%;
+    }
+    
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0.3);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
